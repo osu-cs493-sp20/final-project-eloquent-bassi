@@ -1,0 +1,38 @@
+{
+  "name": "final-project-eloquent-bassi",
+  "version": "0.0.1",
+  "description": "An alterntive to canvas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "serve": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osu-cs493-sp20/final-project-eloquent-bassi.git"
+  },
+  "keywords": [
+    "School",
+    "Managment",
+    "REST",
+    "API"
+  ],
+  "author": "Goose Gang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/osu-cs493-sp20/final-project-eloquent-bassi/issues"
+  },
+  "homepage": "https://github.com/osu-cs493-sp20/final-project-eloquent-bassi#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
+
