@@ -1,7 +1,7 @@
-var {addSchema, validateAgainstSchema} = require("./lib/validate");
+var {addSchema, validateAgainstSchema} = require("../lib/validate");
 
 var testSchema = {
-    "$id": "test",
+    "$id": "test",      //The schema's name
     "type": "object",
     "properties": {
         "name": {"type": "string"},
