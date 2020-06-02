@@ -1,4 +1,4 @@
-var {addSchema, validateAgainstSchema} = require("../lib/validate");
+var {schemaAdd, schemaValidate} = require("../lib/validate");
 
 var testSchema = {
     "$id": "test",      //The schema's name
@@ -44,10 +44,10 @@ var test_mistyping = {  //Typing doesn't match schema
     "childAges": ["5", 7]   //<---
 };
 
-addSchema(testSchema);
+schemaAdd(testSchema);
 
-console.log("test_valid: ", (validateAgainstSchema('test', test_valid) === true));
-console.log("test_missing_valid: ", (validateAgainstSchema('test', test_missing_valid) === true));
-console.log("test_missing_required:", (validateAgainstSchema('test', test_missing_required) === false));
-console.log("test_additional_properties: ", (validateAgainstSchema('test', test_additional_properties) === false));
-console.log("test_mistyping: ", (validateAgainstSchema('test', test_mistyping) === false))
+console.log("test_valid: ", (schemaValidate('test', test_valid) === true));
+console.log("test_missing_valid: ", (schemaValidate('test', test_missing_valid) === true));
+console.log("test_missing_required:", (schemaValidate('test', test_missing_required) === false));
+console.log("test_additional_properties: ", (schemaValidate('test', test_additional_properties) === false));
+console.log("test_mistyping: ", (schemaValidate('test', test_mistyping) === false));
