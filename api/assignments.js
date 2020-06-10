@@ -51,7 +51,7 @@ router.post('/', async (req, res, next) => {
         try{
             let course = await course_db.find_by_id(body.courseId);
             if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-                let id = assignment_db.create();
+                let id = assignment_db.create(body);
                 res.status(201).send({
                     "id": id
                 })
