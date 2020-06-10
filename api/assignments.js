@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const { create, find_by_id } = require('../storage/assignments_db');
+const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
+const course_db = require('../storage/courses_db');
 
 const assignmentSchema = {
     "$id": "createAssignmentBody",
@@ -21,18 +22,20 @@ router.get('/:id', async (req, res, next) => {
     let id = req.body.id;
     if(id){
         try{
-            let assignment = await find_by_id(id);
+            let assignment = await assigment_db.find_by_id(id);
             if(assignment){ 
                 res.status(200).send(assignment);
             }else{
-                res.status(404).send({error: "Assignment with id ${id} not found."});
+                res.status(404).send({error: "Assignment with id ", id, " not found."});
             }
         }
         catch(err){
             res.status().send({"Error": err})
         }
     }
-    res.status(400).send({"Error": "Bad request"})
+    else{
+        res.status(400).send({"Error": "Bad request"})
+    }
 })
 
 router.get('/:id/submissions', async (req, res, next) => {//TODO: This
@@ -41,18 +44,29 @@ router.get('/:id/submissions', async (req, res, next) => {//TODO: This
 
 //==POST==
 router.post('/', async (req, res, next) => {
-    if(req.body && schemaValidate("createAssignmentBody", req.body)){
-        try{
-            let id = create();
-            res.status(201).send({
-                "id": id
-            })
-        }catch(err){
-            res.status().send({"Error": err})
+    let body = req.body.id;
+    let jwt = req.jwt;
+    if(body && schemaValidate("createAssignmentBody", body)){
+        //admin or instructor of the course
+        if(jwt.role === 'admin' || 
+          (jwt.role === 'instructor' && (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
+            try{
+                let id = assignment_db.create();
+                res.status(201).send({
+                    "id": id
+                })
+            }catch(err){
+                res.status().send({"Error": err})
+            }
+        }
+        //Not an admin or the instructor
+        else{
+            res.status(403).send({"Error": "Unauthorized request"})
         }
     }
-    res.status(400).send({"Error": "Bad request"})
-
+    else{
+        res.status(400).send({"Error": "Invalid body"}) 
+    }
 })
 
 router.post('/:id/submissions', async (req, res, next) => {//TODO: This
@@ -60,13 +74,35 @@ router.post('/:id/submissions', async (req, res, next) => {//TODO: This
 })
 
 //==PATCH==
-router.patch('/:id', async (req, res, next) => {//TODO: This
-    if(){
-        try{
+router.patch('/:id', async (req, res, next) => {
+    let body = req.body
+    let id = body.id;
+    let jwt = req.jwt;
+    if(body && id && schemaValidate("createAssignmentBody", body)){
+        //admin or instructor of the course
+        if(jwt.role === 'admin' || 
+          (jwt.role === 'instructor' && 
+          (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
+            try{
+                //TODO: change assignemnt_db.update_by_id parameters to have a body
+                if(await assignment_db.update_by_id(id, body)){
+                    res.status(200);
+                }
+                else{
+                    res.status(404).send({error: "Assignment with id ", id," not found."});
+                }
 
-        }catch(err){
-            
+            }catch(err){
+                res.status().send({"Error": err})
+            }
         }
+        //Not an admin or the instructor
+        else{
+            res.status(403).send({"Error": "Unauthorized request"})
+        }
+    }
+    else{
+        res.status(400).send({"Error": "Invalid body"}) 
     }
 })
 
