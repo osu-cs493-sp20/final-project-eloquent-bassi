@@ -1,6 +1,7 @@
 const router = require('express').Router();
+const checkJwt = require('../lib/auth');
 
-router.get('/:id', async (req, res, next) => {//TODO: This
+router.get('/:id', checkJwt, async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
@@ -8,7 +9,7 @@ router.post('/login', async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
-router.post('/users', async (req, res, next) => {//TODO: This
+router.post('/', async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
