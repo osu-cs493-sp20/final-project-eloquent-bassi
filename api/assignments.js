@@ -8,7 +8,7 @@ const assignmentSchema = {
     "type": "object",
     "required": ["courseId", "title", "points", "due"],
     "properties": {
-        "courseId": { "type": "string|integer" },
+        "courseId": { "type": "integer" },
         "title": { "type": "string" },
         "points": { "type": "integer" },
         "due": { "type": "string" }
@@ -26,7 +26,7 @@ router.get('/:id', async (req, res, next) => {
             if(assignment){ 
                 res.status(200).send(assignment);
             }else{
-                res.status(404).send({error: "Assignment with id ", id, " not found."});
+                res.status(404).send({"Error": "Assignment with id " + id + " not found."});
             }
         }
         catch(err){
@@ -49,7 +49,8 @@ router.post('/', async (req, res, next) => {
     if(body && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
         if(jwt.role === 'admin' || 
-          (jwt.role === 'instructor' && (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
+          (jwt.role === 'instructor' && 
+          (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
             try{
                 let id = assignment_db.create();
                 res.status(201).send({
@@ -89,10 +90,11 @@ router.patch('/:id', async (req, res, next) => {
                     res.status(200);
                 }
                 else{
-                    res.status(404).send({error: "Assignment with id ", id," not found."});
+                    res.status(404).send({"Error": "Assignment with id " + id + " not found."});
                 }
 
-            }catch(err){
+            }
+            catch(err){
                 res.status().send({"Error": err})
             }
         }
@@ -108,11 +110,28 @@ router.patch('/:id', async (req, res, next) => {
 
 //==DELETE==
 router.delete('/:id', async (req, res, next) => {//TODO: This
-    if(){
-        try{
-
-        }catch(err){
-            
+    let id = req.params.id;
+    if(id){
+        //admin or instructor of the course
+        if(jwt.role === 'admin' || 
+        (jwt.role === 'instructor' && 
+            (await course_db.find_by_id( //                         //Get course with assignment's courseId
+                (await assignment_db.find_by_id(id)).courseId ))    //Get courseId of assignment with given id
+        .instructorId === jwt.sub)){                                //Get instructorId of found assignment's course and compare
+            try{
+                if(await assignment_db.remove_by_id(id)){
+                    res.status(204);
+                }
+                else{
+                    res.status(404).send({"Error": "Assignment with id " + id + " not found."});
+                }
+            }
+            catch(err){
+                res.status().send({"Error": err})
+            }
+        }
+        else{
+            res.status(403).send({"Error": "Unauthorized request"})
         }
     }
 })
