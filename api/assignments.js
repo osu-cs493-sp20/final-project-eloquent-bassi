@@ -44,13 +44,12 @@ router.get('/:id/submissions', async (req, res, next) => {//TODO: This
 
 //==POST==
 router.post('/', async (req, res, next) => {
-    let body = req.body.id;
+    let body = req.body;
     let jwt = req.jwt;
     if(body && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
-        if(jwt.role === 'admin' || 
-          (jwt.role === 'instructor' && 
-          (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
+        let course = await course_db.find_by_id(body.courseId);
+        if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
             try{
                 let id = assignment_db.create();
                 res.status(201).send({
@@ -81,11 +80,10 @@ router.patch('/:id', async (req, res, next) => {
     let jwt = req.jwt;
     if(body && id && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
-        if(jwt.role === 'admin' || 
-          (jwt.role === 'instructor' && 
-          (await course_db.find_by_id(body.courseId)).instructorId === jwt.sub)){
+        let course = await course_db.find_by_id(body.courseId);
+        if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
             try{
-                //TODO: change assignemnt_db.update_by_id parameters to have a body
+                //TODO: change assignemnt_db.update_by_id parameters to take a body
                 if(await assignment_db.update_by_id(id, body)){
                     res.status(200);
                 }
@@ -112,26 +110,26 @@ router.patch('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {//TODO: This
     let id = req.params.id;
     if(id){
-        //admin or instructor of the course
-        if(jwt.role === 'admin' || 
-        (jwt.role === 'instructor' && 
-            (await course_db.find_by_id( //                         //Get course with assignment's courseId
-                (await assignment_db.find_by_id(id)).courseId ))    //Get courseId of assignment with given id
-        .instructorId === jwt.sub)){                                //Get instructorId of found assignment's course and compare
-            try{
-                if(await assignment_db.remove_by_id(id)){
+        //Get instructorId of course of the assignment
+        let assignment = await assignment_db.find_by_id(id);
+        if(assignment){
+            let course = await course_db.find_by_id(assignment.courseId);
+            //Is admin or instructor of course
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+                try{
+                    await assignment_db.remove_by_id(id);   //Alrady checked if assignment exists, so just delete
                     res.status(204);
                 }
-                else{
-                    res.status(404).send({"Error": "Assignment with id " + id + " not found."});
+                catch(err){
+                    res.status().send({"Error": err})
                 }
             }
-            catch(err){
-                res.status().send({"Error": err})
+            else{
+            res.status(403).send({"Error": "Unauthorized request"})
             }
         }
         else{
-            res.status(403).send({"Error": "Unauthorized request"})
+            res.status(404).send({"Error": "Assignment with id " + id + " not found."});
         }
     }
 })
