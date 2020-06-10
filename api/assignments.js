@@ -108,7 +108,7 @@ router.patch('/:id', async (req, res, next) => {
 })
 
 //==DELETE==
-router.delete('/:id', async (req, res, next) => {//TODO: This
+router.delete('/:id', async (req, res, next) => {
     let id = req.params.id;
     try{
         //Get instructorId of course of the assignment
