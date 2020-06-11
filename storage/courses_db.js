@@ -1,5 +1,5 @@
 const mysqlpool = require('../lib/mysqlPool')
-
+const { extractValidFields } = require('../lib/validate');
 exports.get_all = async () => {
   const [ result ] = await mysqlPool.query('SELECT * FROM Course');
   return result;
@@ -24,8 +24,9 @@ exports.get_page = async (page) => {
 }
 
 exports.create = async (course) => {
+  course = extractValidFields(course, CourseSchema);
   const [ result ] = await mysqlPool.query('INSERT INTO Course SET ?',course);
-  return result;
+  return result.insertId;
 }
 
 exports.find_by_id = async (id) => {

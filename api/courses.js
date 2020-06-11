@@ -47,7 +47,7 @@ router.get('/:id', async (req, res, next) => {
 }
 })
 
-router.get('/:id/students', async (req, res, next) => {//TODO: This
+router.get('/:id/students', async (req, res, next) => {
   try {
   const students = await get_students_by_id(parseInt(req.params.id));
   if (students) {
@@ -71,8 +71,27 @@ router.get('/:id/roster', async (req, res, next) => {//TODO: This
 
 //==POST==
 router.post('/', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
-})
+  if (schemaValidate(req.body, CourseSchema)) {
+    try {
+      const id = await courses_db.create(req.body);
+      res.status(201).send({
+        id: id,
+        links: {
+          course: `/courses/${id}`
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({
+        error: "Error inserting course into DB.  Please try again later."
+      });
+    }
+  } else {
+    res.status(400).send({
+      error: "Request body is not a valid course object."
+    });
+  }
+});
 
 router.post('/:id/students', async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
