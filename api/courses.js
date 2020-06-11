@@ -126,8 +126,35 @@ router.post('/:id/students', async (req, res, next) => {
 })
 
 //==PATCH==
-router.patch('/:id', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+router.patch('/:id', async (req, res, next) => {
+  let body = req.body
+  let id = body.id;
+  let jwt = req.jwt;
+  if(body && id && schemaValidate("createCourseBody", body)){
+    //admin or instructor of the course
+        try{
+            let course = await courses_db.find_by_id(body.courseId);
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+                //TODO: change assignemnt_db.update_by_id parameters to take a body
+                if(await courses_db.update_by_id(id, body)){
+                    res.status(200);
+                }
+                else{
+                    res.status(404).send({"Error": "Course with id " + id + " not found."});
+                }
+            }
+            //Not an admin or the instructor
+            else{
+                res.status(403).send({"Error": "Unauthorized request"})
+            }
+        }
+        catch{
+            res.status(500).send({"Error": err})
+        }
+    }
+    else{
+        res.status(400).send({"Error": "Invalid body"})
+    }
 })
 
 //==DELETE==
