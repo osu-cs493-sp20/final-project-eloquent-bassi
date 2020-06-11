@@ -50,17 +50,18 @@ exports.students_by_id = async (id) => {
 }
 
 exports.enroll_by_id = async (course_id, student_id) => {
-    const [ result ] = await mysqlPool.query('INSERT INTO Enrolled_in (course_id,student_id) VALUES (?, ?);',[course_id,student_id]);
-    return result;
+  const [ result ] = await mysqlPool.query('INSERT INTO Enrolled_in (course_id,student_id) VALUES (?, ?);',[course_id,student_id]);
+  return result;
 }
 
 exports.unenroll_by_id = async (course_id, student_id) => {
-    const [ result ] = await mysqlPool.query('DELETE FROM Enrolled_in WHERE course_id = ? AND student_id = ?;',[course_id,student_id]);
-    return result;
+  const [ result ] = await mysqlPool.query('DELETE FROM Enrolled_in WHERE course_id = ? AND student_id = ?;',[course_id,student_id]);
+  return result;
 }
 
 exports.assignments_by_id = async (id) => {
-    return
+  const [ result ] = await mysqlPool.query('SELECT * FROM Assignment WHERE course_id = ?;',id);
+  return result;
 }
 
 async function getCourseCount() {
