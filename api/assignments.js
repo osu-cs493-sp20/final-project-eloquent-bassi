@@ -139,7 +139,7 @@ router.post('/:id/submissions', checkJwt, async (req, res, next) => {
 
             //Check if they're a student and enrolled in the course
             //TODO: Update or find actual method to find out if a student is enrolled in a class
-            if(jwt.role === "student" && course_db.is_enrolled(assignment.courseId, jwt.sub)){
+            if(jwt.role === "student"){
                 let submissionId = assignment_db.submit(body, assignmentId);
                 res.status(200).send({
                     "id": submissionId

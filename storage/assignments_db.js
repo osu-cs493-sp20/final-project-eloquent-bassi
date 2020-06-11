@@ -1,10 +1,23 @@
 const mysqlpool = require('../lib/mysqlPool')
+const { extractValidFields } = require('../lib/validate');
+const mysqlPool = require('../lib/mysqlPool');
 
-exports.create = async (assignment) => {//TODO: This
-    return
+exports.create = async (assignment) => {
+    let obj = {
+        courseId: assignment.courseId,
+        title: assignment.title,
+        points: assignment.points,
+        due: assignment.due
+    };
+    const [ result ] = await mysqlPool.query('INSERT INTO Assignment SET ?', obj);
+    return result.insertId;
 }
 
-exports.submit = async (submission, assignmentId) => {//TODO: This
+exports.submit = async (submission, assignmentId) => {
+    //Check if student is enrolled in the class
+    let sub = {
+        assignmentId: 
+    }
     return 
 }
 
