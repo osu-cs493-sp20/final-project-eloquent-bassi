@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "2f6b3ce7-31d0-4735-b373-cc8486510ab6",
+		"name": "assignments",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:7000/assignments/",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"course_id\": 12,\n\t\"title\": \"My first assignment!\",\n\t\"points\": 100,\n\t\"due\": \"2019-06-14T17:00:00-07:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:7000/assignments/",
+					"host": [
+						"localhost"
+					],
+					"port": "7000",
+					"path": [
+						"assignments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/assignments/7",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/7",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/assignments/7",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"course_id\": 12,\n\t\"title\": \"Patched assignment!\",\n\t\"points\": 100,\n\t\"due\": \"2019-06-14T17:00:00-07:00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/assignments/7",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/assignments/7 Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/7",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						"7"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "52b72eeb-6ffe-4141-9e83-510a4eaa6788",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "69c83588-bc9e-4106-8232-44c3672d860d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "930e00f9-d98e-442b-a0d9-ea70a0b2b257",
+			"key": "localhost",
+			"value": "8000",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
