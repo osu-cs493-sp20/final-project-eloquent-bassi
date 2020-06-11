@@ -1,4 +1,4 @@
-const mysqlpool = require('../lib/mysqlPool');
+const mysqlPool = require('../lib/mysqlPool');
 
 exports.get_all = async () => {
   const [ result ] = await mysqlPool.query('SELECT * FROM Course');
@@ -13,7 +13,7 @@ exports.get_page = async (page) => {
   page = page < 1 ? 1 : page;
   const offset = (page - 1) * pageSize;
 
-  const [ results ] = await mysqlPool.query('SELECT * FROM Course ORDER BY id LIMIT ?,?', [ offset, pageSize ] );
+  const [ results ] = await mysqlPool.query('SELECT * FROM Course ORDER BY course_id LIMIT ?,?', [ offset, pageSize ] );
   return {
     courses: results,
     page: page,
@@ -29,7 +29,7 @@ exports.create = async (course) => {
 }
 
 exports.find_by_id = async (id) => {
-  const [ result ] = await mysqlPool.query('SELECT * FROM Course WHERE course_id = ?;',id);
+  const [ result ] = await mysqlPool.query('SELECT * FROM Course WHERE course_id = ?',id);
   return result;
 }
 
