@@ -83,15 +83,14 @@ router.get('/:id/students', checkJwt, async (req, res, next) => {
 
 //WARNING: I think this works, but it hasn't been tested, and if you have a better solution, go for it
 router.get('/:id/roster', checkJwt, async (req, res, next) => {
-  let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-      const roster = await courses_db.get_students_by_id(req.params.id);
+      const roster = await courses_db.students_by_id(id);
       var rosterCSV = convertToCSV(roster);
-      res.attachment(`roster_course_${res.params.id}.csv`);
+      res.attachment(`roster_course_${id}.csv`);
       res.status(200).send(rosterCSV);
     } else {
         res.status(403).send({"Error": "Unauthorized request"})
