@@ -8,9 +8,13 @@ services:
       - ./db-init/:/docker-entrypoint-initdb.d
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: tarpaulin
+      command: --default-authentication-plugin=mysql_native_password
+      MYSQL_USER: app
+      MYSQL_PASSWORD: hunter2
+    networks: 
+      grrnet:
+          ipv4_address: 10.0.0.4
   minio:
     image: minio/minio
     command: server /data
@@ -19,25 +23,40 @@ services:
     volumes:
       - minio-data:/data
     environment: 
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: abcdefghi
+      MINIO_ACCESS_KEY: abcdefghi
+    networks: 
+      grrnet:
+          ipv4_address: 10.0.0.2
   redis:
     image: redis
-  api:
-    build: .
-    image: api-server
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      REDIS_HOST: redis
-      MINIO_HOST: minio
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+    networks: 
+      grrnet:
+          ipv4_address: 10.0.0.3
+  # api:
+  #   build: .
+  #   image: api-server
+  #   environment:
+  #     MYSQL_HOST: mysql
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     REDIS_HOST: redis
+  #     MINIO_HOST: minio
+  #     MINIO_SECRET_KEY: abcdefghi
+  #     MINIO_ACCESS_KEY: abcdefghi
       
 volumes:
   mysql-data:
-    name: tarpaulin-mysql-data
+    name: tarpaulin-mysql-data-2
   minio-data:
     name: tarpaulin-minio-data
+
+networks: 
+  grrnet:
+      driver: bridge
+      ipam:
+          driver: default
+          config: 
+              - subnet: 10.0.0.0/24
+  

