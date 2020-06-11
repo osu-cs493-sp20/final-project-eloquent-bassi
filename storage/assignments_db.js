@@ -3,22 +3,34 @@ const { extractValidFields } = require('../lib/validate');
 const mysqlPool = require('../lib/mysqlPool');
 
 exports.create = async (assignment) => {
-    let obj = {
-        courseId: assignment.courseId,
-        title: assignment.title,
-        points: assignment.points,
-        due: assignment.due
-    };
-    const [ result ] = await mysqlPool.query('INSERT INTO Assignment SET ?', obj);
+    let params = [
+        assignment.courseId,
+        assignment.title,
+        assignment.points,
+        assignment.due
+    ];
+    const [ result ] = await mysqlPool.query('INSERT INTO Assignment(courseId, title, points, due) ', params);
     return result.insertId;
 }
 
-exports.submit = async (submission, assignmentId) => {
+exports.submit = async (submission, courseId) => {
     //Check if student is enrolled in the class
-    let sub = {
-        assignmentId: 
+    const enrolled = await mysqlPool.query(`SELECT * FROM Enrolled WHERE 
+                                            studentId=${submission.studentId} AND 
+                                            course_id=${courseId}`);
+    if(enrolled){
+        let params = [
+            submission.assignmentId,
+            submission.studentId,
+            submission.timestamp,
+            submission.file
+        ];
+        const [ result ] = await mysqlPool.query('INSERT INTO Submission(assignmentId, studentId, timestamp, file', params); 
+        return result.insertId;
     }
-    return 
+    else{
+        return false;
+    }
 }
 
 exports.find_by_id = async (id) => {//TODO: This

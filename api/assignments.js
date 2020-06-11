@@ -5,6 +5,7 @@ const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
 const user_db = require('../storage/users_db');
+const { uploadFile, getFile } = require('../lib/files');
 
 const assignmentSchema = {
     "$id": "createAssignmentBody",
@@ -21,7 +22,7 @@ const assignmentSchema = {
 const submissionSchema = {
     "$id": "createSubmissionBody",
     "type": "object",
-    "required": ["assignmentId", "studentId", "timestamp", "file"],
+    "required": ["studentId", "timestamp", "file"],
     "properties": {
         "assignmentId": { "type": "integer" },
         "studentId": { "type": "integer" },
@@ -37,7 +38,7 @@ schemaAdd(submissionSchema);
 
 //==GET==
 router.get('/:id', checkJwt, async (req, res, next) => {
-    let id = req.body.id;
+    let id = req.params.id;
     if(id){
         try{
             let assignment = await assigment_db.find_by_id(id);
@@ -137,9 +138,9 @@ router.post('/:id/submissions', checkJwt, async (req, res, next) => {
         try{
             let assignment = assignment_db.find_by_id(assignmentId);
 
-            //Check if they're a student and enrolled in the course
-            //TODO: Update or find actual method to find out if a student is enrolled in a class
-            if(jwt.role === "student"){
+            //Check if they're a student and match the assignment being submitted
+            if(jwt.role === "student" && jwt.sub === body.studentId){
+
                 let submissionId = assignment_db.submit(body, assignmentId);
                 res.status(200).send({
                     "id": submissionId
@@ -162,7 +163,7 @@ router.post('/:id/submissions', checkJwt, async (req, res, next) => {
 //==PATCH==
 router.patch('/:id', checkJwt, async (req, res, next) => {
     let body = req.body
-    let id = body.id;
+    let id = req.params.id;
     let jwt = req.jwt;
     if(body && id && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
