@@ -44,7 +44,7 @@ exports.remove_by_id = async (id) => {
 }
 
 exports.students_by_id = async (id) => {
-  const [ result ] = await mysqlPool.query('SELECT * FROM Enrolled_in JOIN Users WHERE Enrolled_in.student_id = Users.user_id AND course_id = ?;',id);
+  const [ result ] = await mysqlPool.query('SELECT user_id, name, email FROM Enrolled_in JOIN Users WHERE Enrolled_in.student_id = Users.user_id AND course_id = ?;',id);
   return result;
   return
 }
