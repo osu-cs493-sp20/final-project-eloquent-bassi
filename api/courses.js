@@ -10,7 +10,7 @@ const courseSchema = {
 schemaAdd(courseSchema);
 
 //==GET==
-router.get('/', async (req, res, next) => {//TODO: This
+router.get('/', async (req, res, next) => {
   try {
       const coursePage = await courses_db.get_page(parseInt(req.query.page) || 1);
       coursePage.links = {};
@@ -31,17 +31,41 @@ router.get('/', async (req, res, next) => {//TODO: This
   }
 });
 
-router.get('/:id', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+router.get('/:id', async (req, res, next) => {
+  try {
+  const course = await courses_db.find_by_id(parseInt(req.params.id));
+  if (course) {
+    res.status(200).send(course);
+  } else {
+    next();
+  }
+} catch (err) {
+  console.error(err);
+  res.status(500).send({
+    error: "Unable to fetch course.  Please try again later."
+  });
+}
 })
 
 router.get('/:id/students', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+  try {
+  const students = await get_students_by_id(parseInt(req.params.id));
+  if (students) {
+    res.status(200).send(students);
+  } else {
+    next();
+  }
+} catch (err) {
+  console.error(err);
+  res.status(500).send({
+    error: "Unable to fetch students.  Please try again later."
+  });
+}
 })
 
 router.get('/:id/roster', async (req, res, next) => {//TODO: This
     courses_db.get_students_by_id(req.params.id);
-    //do the conversion to CSV here
+    //TODO: do the conversion to CSV here
     res.status(200).send("TBD")
 })
 
