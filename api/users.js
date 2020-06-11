@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { find_hash_by_email, find_id_by_email, create, exists, get_corses_by_instructor_id, students_by_id } = require('../storage/users_db')
+const { find_hash_by_email, find_id_by_email, create, exists, get_courses_by_instructor_id, students_by_id } = require('../storage/users_db')
 const { checkJwt, checkPassword, genToken, hashPassword } = require('../lib/auth');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 
@@ -24,7 +24,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
     if(jwt && jwt.role === "instructor"){
         let id = req.params.id
         if(exists(id)){
-            let data = await get_corses_by_instructor_id(id)
+            let data = await get_courses_by_instructor_id(id)
             res.status(200).send(data)
         }
         else{

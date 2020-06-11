@@ -77,18 +77,18 @@ exports.find_id_by_email = async (email) => {
 
 /**
  * @param {number} id
- * @returns {array[json]} All of the corses the instructor owns. Can be empty
+ * @returns {array[json]} All of the courses the instructor owns. Can be empty
  */
-exports.get_corses_by_instructor_id = async (id) => {
+exports.get_courses_by_instructor_id = async (id) => {
     return await mysqlpool.query(`SELECT * FROM Corse WHERE instructorId = ${id}`)
     
 }
 
 /**
  * @param {number} id
- * @returns {array[json]} All of the corses the student is in. Can be empty
+ * @returns {array[json]} All of the courses the student is in. Can be empty
  */
-exports.get_corses_by_student_id = async (id) => {
+exports.get_courses_by_student_id = async (id) => {
     return await mysqlpool.query(`SELECT * FROM Corse INNER JOIN Enrolled_in ON 
     Enrolled_in.student_id = ${id} AND Enrolled_in.corse_id = Corse.corse_id`)
 }
