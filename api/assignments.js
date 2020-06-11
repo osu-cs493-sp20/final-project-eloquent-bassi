@@ -2,6 +2,7 @@ const router = require('express').Router();
 const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
+const user_db = require('../storage/users_db');
 
 const assignmentSchema = {
     "$id": "createAssignmentBody",
@@ -15,7 +16,22 @@ const assignmentSchema = {
     }
 };
 
+const submissionSchema = {
+    "$id": "createSubmissionBody",
+    "type": "object",
+    "required": ["assignmentId", "studentId", "timestamp", "file"],
+    "properties": {
+        "assignmentId": { "type": "integer" },
+        "studentId": { "type": "integer" },
+        "timestamp": { "type": "string",
+                       "format": "date-time"                    
+        },
+        "file": { "type": "string" }
+    }    
+}
+
 schemaAdd(assignmentSchema);
+schemaAdd(submissionSchema);
 
 //==GET==
 router.get('/:id', async (req, res, next) => {
@@ -39,7 +55,40 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.get('/:id/submissions', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+    //Requires page (query), studentid(query), id (path)
+    let page = req.query.page;
+    let studentId = req.query.studentId;
+    let id = req.params.id;
+    if(page && studentId && id){
+        try{
+            //Admin or instructor of course of assignment with given id
+            let assignment = await assignment_db.find_by_id(id);
+            if(assignment){
+                let course = await course_db.find_by_id(assignment.courseId);
+                if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+                    
+                    //paginate
+                    const pageSize = 10;
+                    let submissions = assignment_db.submissions_by_id(id);
+                    let count = submissions.length;
+
+                    
+                    res.status(200).send({
+                        "submissions": assignmentPage
+                    })
+                }
+                else{
+                    res.status(403).send({"Error": "Unauthorized request"});
+                }
+            }
+        }
+        catch(err){
+            res.status(500).send({"Error": err})
+        }
+    }
+    else{
+        res.status(400).send({"Error": "Invalid body"})
+    }
 })
 
 //==POST==
