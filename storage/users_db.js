@@ -20,7 +20,7 @@ const userSchema = {
 exports.create = async (user) => {
     let id = await mysqlpool.query(`SELECT user_id FROM Users WHERE email = ${user.email}`)
     if(id){
-        throw "user_db.UserAlreadyExists"
+        throw new Error("user_db.UserAlreadyExists")
     }
     else{
         return await mysqlpool.query(`INSERT INTO Users(name,email,password,role) 
@@ -53,7 +53,7 @@ exports.find_by_id = async (id) => {//FIXME: Do we want to return the password w
         return user
     }
     else{
-        throw "user_db.UserIdNotFound"
+        throw new Error("user_db.UserIdNotFound")
     }
 }
 
@@ -68,7 +68,7 @@ exports.find_hash_by_email = async (email) => {
         return password
     }
     else {
-        throw "user_bd.EmailNotFound"
+        throw new Error("user_bd.EmailNotFound")
     }
 }
 
@@ -83,7 +83,7 @@ exports.find_id_by_email = async (email) => {
         return id
     }
     else{
-        throw "user_db.EmailNotFound"
+        throw new Error("user_db.EmailNotFound")
     }
 }
 
