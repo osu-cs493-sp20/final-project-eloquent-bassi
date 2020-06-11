@@ -4,7 +4,7 @@ const mysqlPool = require('../lib/mysqlPool');
 
 exports.create = async (assignment) => {
     let params = [
-        assignment.courseId,
+        assignment.course_id,
         assignment.title,
         assignment.points,
         assignment.due
@@ -20,8 +20,8 @@ exports.submit = async (submission, courseId) => {
                                             course_id=${courseId}`);
     if(enrolled){
         let params = [
-            submission.assignmentId,
-            submission.studentId,
+            submission.assignment_id,
+            submission.student_id,
             submission.timestamp,
             submission.file
         ];
@@ -40,7 +40,7 @@ exports.find_by_id = async (id) => {
 
 exports.update_by_id = async (id, assignment) => {
     const [result] = await mysqlPool.query('UPDATE Assignment SET ? WHERE assignment_id = ?', [assignment, id]);
-    
+
     return result;
 }
 

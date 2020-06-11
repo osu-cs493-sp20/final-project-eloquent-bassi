@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const crypto = require('crypto');
+const path = require('path');
 
 const { checkJwt }= require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
@@ -45,8 +46,7 @@ const upload = multer({
       dest: `/uploads`,
       filename: (req, file, callback) => {
         const filename = crypto.pseudoRandomBytes(16).toString("hex");
-        const extension = file.type;
-        callback(null, `${filename}.${extension}`);
+        callback(null, `${filename}` + path.extname(file.originalname));
       }
     })
   });
