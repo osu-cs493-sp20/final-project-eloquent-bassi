@@ -35,7 +35,7 @@ schemaAdd(assignmentSchema);
 schemaAdd(submissionSchema);
 
 //==GET==
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkJwt, async (req, res, next) => {
     let id = req.body.id;
     if(id){
         try{
@@ -55,7 +55,7 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
-router.get('/:id/submissions', async (req, res, next) => {//TODO: This
+router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
     //Requires page (query), studentid(query), id (path)
     let page = req.query.page;
     let studentId = req.query.studentId;
@@ -128,7 +128,7 @@ router.post('/', checkJwt, async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', async (req, res, next) => {
+router.post('/:id/submissions', checkJwt, async (req, res, next) => {
     let body = req.body;
     let assignmentId = req.params.id;
     let jwt = req.jwt;
