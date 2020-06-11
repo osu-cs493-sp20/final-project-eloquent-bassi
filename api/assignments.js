@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const multer = require('multer');
+const crypto = require('crypto');
 
 const { checkJwt }= require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
@@ -35,6 +37,20 @@ const submissionSchema = {
 
 schemaAdd(assignmentSchema);
 schemaAdd(submissionSchema);
+
+//Multer stuff to get a file
+const upload = multer({
+    storage: multer.diskStorage({
+      dest: `${__dirname}/uploads`,
+      filename: (req, file, callback) => {
+        const filename = crypto.pseudoRandomBytes(16).toString("hex");
+        const extension = file.mimetype;
+        callback(null, `${filename}.${extension}`);
+      }
+    })
+  });
+
+
 
 //==GET==
 router.get('/:id', checkJwt, async (req, res, next) => {
@@ -130,18 +146,26 @@ router.post('/', checkJwt, async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', checkJwt, async (req, res, next) => {
+router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) => {
     let body = req.body;
     let assignmentId = req.params.id;
     let jwt = req.jwt;
-    if(body && schemaValidate("createSubmissionBody", body)){
+    let submission = {
+        "assignmentId": body.assignmentId,
+        "studentId": body.studentId,
+        "timestamp": body.timestamp,
+        "file": req.file
+    };
+    if(body && schemaValidate("createSubmissionBody", sub)){
         try{
             let assignment = assignment_db.find_by_id(assignmentId);
 
             //Check if they're a student and match the assignment being submitted
             if(jwt.role === "student" && jwt.sub === body.studentId){
 
-                let submissionId = assignment_db.submit(body, assignmentId);
+                //Upload file then submit submission
+                uploadFile(req.file.path, req.file.filename, file.mimetype);
+                let submissionId = assignment_db.submit(submission, assignment.courseId);
                 res.status(200).send({
                     "id": submissionId
                 })
