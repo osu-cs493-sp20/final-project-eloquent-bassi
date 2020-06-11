@@ -4,14 +4,17 @@ const { checkJwt, checkPassword, genToken, hashPassword } = require('../lib/auth
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 
 const userSchema = {
-    "$id": "user",
-    "type": "object",
-    "required": ["name", "email", "password", "role"],
-    "properties": {
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "password": { "type": "string" },
-        "role": { "type": "string" }
+    $id: "createUserBody",
+    type: "object",
+    required: ["name", "email", "password", "role"],
+    properties: {
+        name: { type: "string" },
+        email: { type: "string" },
+        password: { type: "string" },
+        role: {
+            type: "string",
+            enum: ["student", "instructor", "admin"]
+        }
     }
 };
 schemaAdd(userSchema);
