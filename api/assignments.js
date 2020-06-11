@@ -42,13 +42,11 @@ schemaAdd(submissionSchema);
 //Multer stuff to get a file
 const upload = multer({
     storage: multer.diskStorage({
-      dest: `${__dirname}/uploads`,
+      dest: `/uploads`,
       filename: (req, file, callback) => {
-          console.log("filename");
         const filename = crypto.pseudoRandomBytes(16).toString("hex");
-        const extension = file.mimetype;
+        const extension = file.type;
         callback(null, `${filename}.${extension}`);
-        console.log("filename 2");
       }
     })
   });
@@ -130,6 +128,7 @@ router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
 router.post('/', checkJwt, async (req, res, next) => {
     let body = req.body;
     let jwt = req.jwt;
+    console.log("course: ", body.course_id);
     if(body && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
         try{
