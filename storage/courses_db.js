@@ -1,5 +1,5 @@
-const mysqlpool = require('../lib/mysqlPool')
-const { schemaValidate } = require('../lib/validate');
+const mysqlpool = require('../lib/mysqlPool');
+
 exports.get_all = async () => {
   const [ result ] = await mysqlPool.query('SELECT * FROM Course');
   return result;
@@ -24,7 +24,6 @@ exports.get_page = async (page) => {
 }
 
 exports.create = async (course) => {
-  course = schemaValidate("createCourseBody",course);
   const [ result ] = await mysqlPool.query('INSERT INTO Course SET ?',course);
   return result.insertId;
 }
