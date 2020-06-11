@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { checkJwt } = require('../lib/auth');
 
 const { schemaAdd, schemaValidate } = require("../lib/validate");
 const courses_db = require('../storage/courses_db');
@@ -57,7 +58,7 @@ router.get('/:id', async (req, res, next) => {
 }
 })
 
-router.get('/:id/students', async (req, res, next) => {
+router.get('/:id/students', checkJwt, async (req, res, next) => {
   try {
   const students = await get_students_by_id(parseInt(req.params.id));
   if (students) {
@@ -74,7 +75,7 @@ router.get('/:id/students', async (req, res, next) => {
 })
 
 //WARNING: I think this works, but it hasn't been tested, and if you have a better solution, go for it
-router.get('/:id/roster', async (req, res, next) => {
+router.get('/:id/roster', checkJwt, async (req, res, next) => {
     const roster = await courses_db.get_students_by_id(req.params.id);
     var rosterCSV = convertToCSV(roster);
     res.attachment(`roster_course_${res.params.id}.csv`);
@@ -82,7 +83,7 @@ router.get('/:id/roster', async (req, res, next) => {
 })
 
 //==POST==
-router.post('/', async (req, res, next) => {
+router.post('/', checkJwt, async (req, res, next) => {
   if (schemaValidate(req.body, CourseSchema)) {
     try {
       const id = await courses_db.create(req.body);
@@ -105,7 +106,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/:id/students', async (req, res, next) => {
+router.post('/:id/students', checkJwt, async (req, res, next) => {
   try {
     if (req.body.add) {
       req.body.add.forEach(async(item, i) => {
@@ -126,7 +127,7 @@ router.post('/:id/students', async (req, res, next) => {
 })
 
 //==PATCH==
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', checkJwt, async (req, res, next) => {
   let body = req.body
   let id = body.id;
   let jwt = req.jwt;
@@ -158,7 +159,7 @@ router.patch('/:id', async (req, res, next) => {
 })
 
 //==DELETE==
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', checkJwt, async (req, res, next) => {
   try {
     const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
     if (deleteSuccessful) {
@@ -174,9 +175,8 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-
 function convertToCSV(arr) {
-  const array = [Object.keys(arr[0])].concat(arr)
+  const array = [Object.keys(arr[0])].concat(arr
 
   return array.map(it => {
     return Object.values(it).toString()
