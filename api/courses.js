@@ -63,14 +63,16 @@ router.get('/:id/students', async (req, res, next) => {
 }
 })
 
-router.get('/:id/roster', async (req, res, next) => {//TODO: This
-    courses_db.get_students_by_id(req.params.id);
-    //TODO: do the conversion to CSV here
-    res.status(200).send("TBD")
+//WARNING: I think this works, but it hasn't been tested, and if you have a better solution, go for it
+router.get('/:id/roster', async (req, res, next) => {
+    const roster = await courses_db.get_students_by_id(req.params.id);
+    var rosterCSV = convertToCSV(roster);
+    res.attachment(`roster_course_${res.params.id}.csv`);
+    res.status(200).send(rosterCSV);
 })
 
 //==POST==
-router.post('/', async (req, res, next) => {//TODO: This
+router.post('/', async (req, res, next) => {
   if (schemaValidate(req.body, CourseSchema)) {
     try {
       const id = await courses_db.create(req.body);
@@ -107,5 +109,13 @@ router.delete('/:id', async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
+
+function convertToCSV(arr) {
+  const array = [Object.keys(arr[0])].concat(arr)
+
+  return array.map(it => {
+    return Object.values(it).toString()
+  }).join('\n')
+}
 
 module.exports = router;
