@@ -8,7 +8,6 @@ const rateLimit = require("./lib/rateLimiting");
 const app = express();
 const port = process.env.PORT || 8000;
 
-console.log(rateLimit);
 app.use(rateLimit);
 app.use(morgan("dev"));
 app.use(express.json());
