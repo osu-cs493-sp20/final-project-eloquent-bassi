@@ -33,8 +33,9 @@ exports.find_by_id = async (id) => {
   return result;
 }
 
-exports.update_by_id = async (id) => {
-    return
+exports.update_by_id = async (id, course) => {
+  const [ result ] = await mysqlPool.query('UPDATE SET ? WHERE course_id = ?', [course,id]);
+  return result;
 }
 
 exports.remove_by_id = async (id) => {
