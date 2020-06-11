@@ -18,7 +18,24 @@ services:
       - 9000:9000
     volumes:
       - minio-data:/data
-
+    environment: 
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+  redis:
+    image: redis
+  api:
+    build: .
+    image: api-server
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REDIS_HOST: redis
+      MINIO_HOST: minio
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      
 volumes:
   mysql-data:
     name: tarpaulin-mysql-data

@@ -3,10 +3,12 @@ const morgan = require("morgan");
 
 const api = require("./api");
 const users = require("./api/users");
+const rateLimit = require("./lib/rateLimiting");
 
 const app = express();
 const port = process.env.PORT || 8000;
 
+app.use(rateLimit);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.static("public"));
