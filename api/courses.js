@@ -105,8 +105,21 @@ router.patch('/:id', async (req, res, next) => {//TODO: This
 })
 
 //==DELETE==
-router.delete('/:id', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+router.delete('/:id', async (req, res, next) => {
+  try {
+      const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
+      if (deleteSuccessful) {
+        res.status(204).end();
+      } else {
+        next();
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({
+        error: "Unable to delete course.  Please try again later."
+      });
+    }
+  }
 })
 
 
