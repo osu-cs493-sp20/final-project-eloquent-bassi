@@ -105,12 +105,10 @@ router.get('/:id/roster', checkJwt, async (req, res, next) => {
 //==POST==
 router.post('/', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
   let jwt = req.jwt;
   if (schemaValidate("courseSchema", req.body)) {
     try{
-      let course = await courses_db.find_by_id(body.courseId);
-      if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+      if(jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === body.instructorId)){
         const id = await courses_db.create(req.body);
         res.status(201).send({
           id: id,
