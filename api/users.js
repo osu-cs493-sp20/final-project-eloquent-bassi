@@ -31,7 +31,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
             res.status(404).send({"Error": "User not found"})
         }
     }
-    else if (jwt){
+    else if (jwt && jwt.role === "student"){
         let id = req.params.id
         if(exists(id)){
             let data = await students_by_id(id)

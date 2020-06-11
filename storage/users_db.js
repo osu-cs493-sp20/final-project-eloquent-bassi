@@ -80,7 +80,7 @@ exports.find_id_by_email = async (email) => {
  * @returns {array[json]} All of the courses the instructor owns. Can be empty
  */
 exports.get_courses_by_instructor_id = async (id) => {
-    return await mysqlpool.query(`SELECT * FROM Corse WHERE instructorId = ${id}`)
+    return await mysqlpool.query(`SELECT * FROM Course WHERE instructorId = ${id}`)
     
 }
 
@@ -89,6 +89,6 @@ exports.get_courses_by_instructor_id = async (id) => {
  * @returns {array[json]} All of the courses the student is in. Can be empty
  */
 exports.get_courses_by_student_id = async (id) => {
-    return await mysqlpool.query(`SELECT * FROM Corse INNER JOIN Enrolled_in ON 
-    Enrolled_in.student_id = ${id} AND Enrolled_in.corse_id = Corse.corse_id`)
+    return await mysqlpool.query(`SELECT * FROM Course INNER JOIN Enrolled_in ON 
+    Enrolled_in.student_id = ${id} AND Enrolled_in.course_id = Course.course_id`)
 }
