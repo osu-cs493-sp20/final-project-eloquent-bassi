@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const checkJwt = require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
@@ -38,12 +39,12 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
-router.get('/:id/submissions', async (req, res, next) => {//TODO: This
+router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
 //==POST==
-router.post('/', async (req, res, next) => {
+router.post('/', checkJwt, async (req, res, next) => {
     let body = req.body;
     let jwt = req.jwt;
     if(body && schemaValidate("createAssignmentBody", body)){
@@ -70,12 +71,12 @@ router.post('/', async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', async (req, res, next) => {//TODO: This
+router.post('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
     res.status(200).send("TBD")
 })
 
 //==PATCH==
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', checkJwt, async (req, res, next) => {
     let body = req.body
     let id = body.id;
     let jwt = req.jwt;
@@ -108,7 +109,7 @@ router.patch('/:id', async (req, res, next) => {
 })
 
 //==DELETE==
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', checkJwt, async (req, res, next) => {
     let id = req.params.id;
     try{
         //Get instructorId of course of the assignment

@@ -1,5 +1,5 @@
-const router = require("express").Router();
-
+const router = require('express').Router();
+const checkJwt = require('../lib/auth');
 const { schemaAdd, schemaValidate } = require("../lib/validate");
 const { create } = require("../storage/users_db");
 
