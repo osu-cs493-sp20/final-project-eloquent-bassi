@@ -17,7 +17,8 @@ const assignmentSchema = {
         "courseId": { "type": "integer" },
         "title": { "type": "string" },
         "points": { "type": "integer" },
-        "due": { "type": "string" }
+        "due": { "type": "string" ,
+                "format": "date-time"}
     }
 };
 
@@ -57,7 +58,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
     let id = req.params.id;
     if(id){
         try{
-            let assignment = await assigment_db.find_by_id(id);
+            let assignment = await assignment_db.find_by_id(id);
             if(assignment){
                 res.status(200).send(assignment);
             }else{
@@ -65,6 +66,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
             }
         }
         catch(err){
+            console.log("Error: ", err);
             res.status(500).send({"Error": err})
         }
     }
@@ -131,7 +133,8 @@ router.post('/', checkJwt, async (req, res, next) => {
         try{
             let course = await course_db.find_by_id(body.courseId);
             if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-                let id = assignment_db.create(body);
+                let id = await assignment_db.create(body);
+                console.log("id value:",id);
                 res.status(201).send({
                     "id": id
                 })

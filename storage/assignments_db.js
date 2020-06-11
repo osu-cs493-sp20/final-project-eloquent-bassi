@@ -34,7 +34,7 @@ exports.submit = async (submission, courseId) => {
 }
 
 exports.find_by_id = async (id) => {
-    const [result] = await mysqlPool.query('SELECT * FROM Assignment WHERE id= ?', id);
+    const [result] = await mysqlPool.query('SELECT * FROM Assignment WHERE assignment_id= ?', id);
     return result[0];
 }
 
