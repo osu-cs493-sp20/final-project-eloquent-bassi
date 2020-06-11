@@ -12,7 +12,7 @@ const { uploadFile, getFile } = require('../lib/files');
 const assignmentSchema = {
     "$id": "createAssignmentBody",
     "type": "object",
-    "required": ["courseId", "title", "points", "due"],
+    "required": ["course_id", "title", "points", "due"],
     "properties": {
         "course_id": { "type": "integer" },
         "title": { "type": "string" },
@@ -25,7 +25,7 @@ const assignmentSchema = {
 const submissionSchema = {
     "$id": "createSubmissionBody",
     "type": "object",
-    "required": ["studentId", "timestamp", "file"],
+    "required": ["student_id", "timestamp", "file"],
     "properties": {
         "assignment_id": { "type": "integer" },
         "student_id": { "type": "integer" },
@@ -44,9 +44,11 @@ const upload = multer({
     storage: multer.diskStorage({
       dest: `${__dirname}/uploads`,
       filename: (req, file, callback) => {
+          console.log("filename");
         const filename = crypto.pseudoRandomBytes(16).toString("hex");
         const extension = file.mimetype;
         callback(null, `${filename}.${extension}`);
+        console.log("filename 2");
       }
     })
   });
@@ -78,7 +80,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
 router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
     //Requires page (query), studentid(query), id (path)
     let page = req.query.page;
-    let studentId = req.query.studentId;
+    let student_id = req.query.studentId;
     let id = req.params.id;
     let submissions = [];
     try{
@@ -154,6 +156,7 @@ router.post('/', checkJwt, async (req, res, next) => {
 })
 
 router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) => {
+    console.log("Top of submission post");
     let body = req.body;
     let assignment_id = req.params.id;
     let jwt = req.jwt;
@@ -201,9 +204,8 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
         try{
             let course = await course_db.find_by_id(body.course_id);
             if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructor_id))){
-                //TODO: change assignemnt_db.update_by_id parameters to take a body
                 if(await assignment_db.update_by_id(id, body)){
-                    res.status(200);
+                    res.status(200).send("Success");
                 }
                 else{
                     res.status(404).send({"Error": "Assignment with id " + id + " not found."});

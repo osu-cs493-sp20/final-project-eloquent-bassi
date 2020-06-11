@@ -39,7 +39,8 @@ exports.find_by_id = async (id) => {
 }
 
 exports.update_by_id = async (id, assignment) => {
-    const [result] = await mysqlPool.query('UPDATE SET ? WHERE assignment_id = ?', [assignment, id]);
+    const [result] = await mysqlPool.query('UPDATE Assignment SET ? WHERE assignment_id = ?', [assignment, id]);
+    
     return result;
 }
 
