@@ -29,7 +29,7 @@ const submissionSchema = {
         },
         "file": { "type": "string" }
     }    
-}
+};
 
 schemaAdd(assignmentSchema);
 schemaAdd(submissionSchema);
@@ -53,7 +53,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
     else{
         res.status(400).send({"Error": "Bad request"})
     }
-})
+});
 
 router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
     //Requires page (query), studentid(query), id (path)
