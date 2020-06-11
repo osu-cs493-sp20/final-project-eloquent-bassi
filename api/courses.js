@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const checkJwt = require('../lib/auth');
+const { checkJwt } = require('../lib/auth');
 
 //==GET==
 router.get('/', async (req, res, next) => {//TODO: This
