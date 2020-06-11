@@ -5,7 +5,7 @@ const { schemaAdd, schemaValidate } = require("../lib/validate");
 const courses_db = require('../storage/courses_db');
 
 const courseSchema = {
-  "$id": "createCourseBody",
+  "$id": "courseSchema",
   "type": "object",
   "required": ["subject","number","title","term","instructor_id"],
   "properties": {
@@ -107,8 +107,7 @@ router.post('/', checkJwt, async (req, res, next) => {
   let body = req.body
   let id = body.id;
   let jwt = req.jwt;
-  // FIXME: Schema 
-  if (true) {//schemaValidate(req.body, CourseSchema)
+  if (schemaValidate(req.body, courseSchema)) {
     try{
       let course = await courses_db.find_by_id(body.courseId);
       if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){

@@ -4,7 +4,7 @@ const { checkToken, checkJwt, checkPassword, genToken, hashPassword } = require(
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 
 const userSchema = {
-    $id: "createUserBody",
+    $id: "userSchema",
     type: "object",
     required: ["name", "email", "password", "role"],
     properties: {
@@ -76,8 +76,7 @@ router.post('/', checkJwt, async (req, res, next) => {
     // Extract the body
     let body = req.body
     // If we have a body and it's valid
-    // FIXME: Schema 
-    if(body){//&& schemaValidate('userSchema', body)
+    if(body && schemaValidate('userSchema', body)){
         let role = body.role
         // If the role they want is a protected class...
         if(role === 'admin' || role === 'instructor'){
