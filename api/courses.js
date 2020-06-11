@@ -108,12 +108,12 @@ router.post('/', async (req, res, next) => {
 router.post('/:id/students', async (req, res, next) => {
   try {
     if (req.body.add) {
-      req.body.add.forEach((item, i) => {
+      req.body.add.forEach(async(item, i) => {
         const result = await courses_db.enroll_by_id(req.params.id, parseInt(i));
       });
     }
     if (req.body.remove) {
-      req.body.remove.forEach((item, i) => {
+      req.body.remove.forEach( async(item, i) => {
         const result = await courses_db.remove_by_id(req.params.id, parseInt(i));
       });
     }
@@ -148,7 +148,7 @@ router.patch('/:id', async (req, res, next) => {
                 res.status(403).send({"Error": "Unauthorized request"})
             }
         }
-        catch{
+        catch (err) {
             res.status(500).send({"Error": err})
         }
     }
@@ -160,20 +160,19 @@ router.patch('/:id', async (req, res, next) => {
 //==DELETE==
 router.delete('/:id', async (req, res, next) => {
   try {
-      const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
-      if (deleteSuccessful) {
-        res.status(204).end();
-      } else {
-        next();
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({
-        error: "Unable to delete course.  Please try again later."
-      });
+    const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
+    if (deleteSuccessful) {
+      res.status(204).end();
+    } else {
+      next();
     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      error: "Unable to delete course.  Please try again later."
+    });
   }
-})
+});
 
 
 function convertToCSV(arr) {
