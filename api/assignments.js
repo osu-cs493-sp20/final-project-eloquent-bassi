@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const checkJwt = require('../lib/auth');
+const { checkJwt } = require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
