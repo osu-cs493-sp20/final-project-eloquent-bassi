@@ -96,7 +96,23 @@ router.post('/', async (req, res, next) => {
 });
 
 router.post('/:id/students', async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+  try {
+    if (req.body.add) {
+      req.body.add.forEach((item, i) => {
+        const result = await courses_db.enroll_by_id(req.params.id, parseInt(i));
+      });
+    }
+    if (req.body.remove) {
+      req.body.remove.forEach((item, i) => {
+        const result = await courses_db.remove_by_id(req.params.id, parseInt(i));
+      });
+    }
+    res.status(200);
+  } catch (err) {
+    res.status(400).send({
+      error: "Request body contains at least one invalid user."
+    });
+  }
 })
 
 //==PATCH==
