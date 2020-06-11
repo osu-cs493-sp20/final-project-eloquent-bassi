@@ -99,6 +99,10 @@ router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
                     submissions = assignment_db.submissions_by_id(id, page);
                 }
 
+                for(x in submissions){
+                    let url = getFile(x.file);
+                    x.url = url;
+                }
                 res.status(200).send({
                     "page": page,
                     "submissions": submissions
@@ -154,7 +158,7 @@ router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) =
         "assignmentId": body.assignmentId,
         "studentId": body.studentId,
         "timestamp": body.timestamp,
-        "file": req.file
+        "file": req.file.filename
     };
     if(body && schemaValidate("createSubmissionBody", sub)){
         try{

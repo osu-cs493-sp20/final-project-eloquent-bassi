@@ -70,7 +70,7 @@ exports.submissions_by_id = async (id, page) => {
     }
 }
 
-exports.submissions_by_studentId = async (id, studentId, page) =>{//TODO: this
+exports.submissions_by_studentId = async (id, studentId, page) =>{
         //Get count
     const [ results ] = await mysqlPool.query(
         'SELECT COUNT(*) AS count FROM Submissions');
@@ -89,11 +89,11 @@ exports.submissions_by_studentId = async (id, studentId, page) =>{//TODO: this
         submissions: result,
         page: page,
         totalPages: lastPage,
-        pageSize: pageSize,
-        
+        pageSize: pageSize,  
     }
 }
 
 exports.update_submission_by_id = async (id) => {//TODO: This
-    return
+    const [result] = await mysqlPool.query('UPDATE Submission SET ? WHERE assignment_id = ?', [assignment, id]);
+    return result;
 }
