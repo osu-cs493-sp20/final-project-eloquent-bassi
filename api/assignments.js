@@ -26,10 +26,10 @@ const submissionSchema = {
         "assignmentId": { "type": "integer" },
         "studentId": { "type": "integer" },
         "timestamp": { "type": "string",
-                       "format": "date-time"                    
+                       "format": "date-time"
         },
         "file": { "type": "string" }
-    }    
+    }
 };
 
 schemaAdd(assignmentSchema);
@@ -41,7 +41,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
     if(id){
         try{
             let assignment = await assigment_db.find_by_id(id);
-            if(assignment){ 
+            if(assignment){
                 res.status(200).send(assignment);
             }else{
                 res.status(404).send({"Error": "Assignment with id " + id + " not found."});
@@ -125,7 +125,7 @@ router.post('/', checkJwt, async (req, res, next) => {
         }
     }
     else{
-        res.status(400).send({"Error": "Invalid body"}) 
+        res.status(400).send({"Error": "Invalid body"})
     }
 })
 
@@ -154,7 +154,7 @@ router.post('/:id/submissions', checkJwt, async (req, res, next) => {
         }
     }
     else{
-        res.status(400).send({"Error": "Invalid body"}) 
+        res.status(400).send({"Error": "Invalid body"})
     }
 
 })
@@ -183,12 +183,12 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
                 res.status(403).send({"Error": "Unauthorized request"})
             }
         }
-        catch{
+        catch (err){
             res.status(500).send({"Error": err})
         }
     }
     else{
-        res.status(400).send({"Error": "Invalid body"}) 
+        res.status(400).send({"Error": "Invalid body"})
     }
 })
 
@@ -214,7 +214,7 @@ router.delete('/:id', checkJwt, async (req, res, next) => {
             res.status(404).send({"Error": "Assignment with id " + id + " not found."});
         }
     }
-    catch{
+    catch (err) {
         res.status(500).send({"Error": err})
     }
 })

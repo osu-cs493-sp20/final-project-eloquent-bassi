@@ -160,7 +160,7 @@ router.post('/:id/students', checkJwt, async (req, res, next) => {
       error: "Request body contains at least one invalid user."
     });
   }
-})
+});
 
 //==PATCH==
 router.patch('/:id', checkJwt, async (req, res, next) => {
@@ -183,15 +183,14 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
             else{
                 res.status(403).send({"Error": "Unauthorized request"})
             }
-        }
-        catch (err) {
+        } catch (err) {
             res.status(500).send({"Error": err})
         }
     }
     else{
         res.status(400).send({"Error": "Invalid body"})
     }
-})
+});
 
 //==DELETE==
 router.delete('/:id', checkJwt, async (req, res, next) => {
@@ -219,7 +218,7 @@ router.delete('/:id', checkJwt, async (req, res, next) => {
 });
 
 function convertToCSV(arr) {
-  const array = [Object.keys(arr[0])].concat(arr
+  const array = [Object.keys(arr[0])].concat(arr);
 
   return array.map(it => {
     return Object.values(it).toString()
