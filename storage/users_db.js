@@ -6,13 +6,14 @@ const mysqlpool = require('../lib/mysqlPool')
  * @throws {user_db.UserAlreadyExists}
  */
 exports.create = async (user) => {
-    let id = await mysqlpool.query(`SELECT user_id FROM Users WHERE email = ${user.email}`)
-    if(id){
+    let [id] = await mysqlpool.query(`SELECT user_id FROM Users WHERE email = "${user.email}"`)
+    if(id.length > 0){
         throw new Error("user_db.UserAlreadyExists")
     }
     else{
-        return await mysqlpool.query(`INSERT INTO Users(name,email,password,role) 
-        VALUES("${user.name}","${user.email}","${user.password}","${user.role}")`)
+        let [val] = await mysqlpool.query(`INSERT INTO Users(name,email,password,role,description) 
+        VALUES("${user.name}","${user.email}","${user.password}","${user.role}","")`)
+        return val.insertId
     }
 }
 
@@ -21,8 +22,8 @@ exports.create = async (user) => {
  * @returns {boolean} Weather or not the id exists
  */
 exports.exists = async (id) => {
-    let name = await mysqlpool.query(`SELECT name FROM Users WHERE user_id = ${id}`)
-    if(name){
+    let [name] = await mysqlpool.query(`SELECT name FROM Users WHERE user_id = ${id}`)
+    if(name != []){
         return true
     }
     else{
@@ -36,7 +37,7 @@ exports.exists = async (id) => {
  * @throws {user_db.UserIdNotFound}
  */
 exports.find_by_id = async (id) => {//FIXME: Do we want to return the password with this call?
-    let user = await mysqlpool.query(`SELECT * FROM Users WHERE user_id = ${id}`)
+    let [[user]] = await mysqlpool.query(`SELECT * FROM Users WHERE user_id = ${id}`)
     if(user){
         return user
     }
@@ -51,7 +52,8 @@ exports.find_by_id = async (id) => {//FIXME: Do we want to return the password w
  * @throws {user_db.EmailNotFound} when the email cannot be found
  */
 exports.find_hash_by_email = async (email) => {
-    let password = await mysqlpool.query(`SELECT password FROM Users WHERE email = "${email}"`)
+    let [[password]] = await mysqlpool.query(`SELECT password FROM Users WHERE email = "${email}"`)
+    password = password.password
     if(password){
         return password
     }
@@ -66,7 +68,8 @@ exports.find_hash_by_email = async (email) => {
  * @throws {user_db.EmailNotFound} when the email cannot be found
  */
 exports.find_id_by_email = async (email) => {
-    let id = await mysqlpool.query(`SELECT user_id FROM Users WHERE email = "${email}"`)
+    let [[id]] = await mysqlpool.query(`SELECT user_id FROM Users WHERE email = "${email}"`)
+    id = id.user_id
     if(id){
         return id
     }
@@ -80,7 +83,8 @@ exports.find_id_by_email = async (email) => {
  * @returns {array[json]} All of the courses the instructor owns. Can be empty
  */
 exports.get_courses_by_instructor_id = async (id) => {
-    return await mysqlpool.query(`SELECT * FROM Course WHERE instructorId = ${id}`)
+    let [val] = await mysqlpool.query(`SELECT * FROM Course WHERE instructor_id = ${id}`)
+    return val
     
 }
 
@@ -89,6 +93,12 @@ exports.get_courses_by_instructor_id = async (id) => {
  * @returns {array[json]} All of the courses the student is in. Can be empty
  */
 exports.get_courses_by_student_id = async (id) => {
-    return await mysqlpool.query(`SELECT * FROM Course INNER JOIN Enrolled_in ON 
+    let [val] = await mysqlpool.query(`SELECT * FROM Course INNER JOIN Enrolled_in ON 
     Enrolled_in.student_id = ${id} AND Enrolled_in.course_id = Course.course_id`)
+    return val
+}
+
+exports.removeJon = async () => {
+    await mysqlpool.query(`DELETE FROM Users WHERE name = "Richj"`)
+    await mysqlpool.query(`DELETE FROM Users WHERE name = "Jim"`)// Jim too
 }
