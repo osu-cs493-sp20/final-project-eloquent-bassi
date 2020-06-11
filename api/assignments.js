@@ -59,6 +59,7 @@ router.get('/:id/submissions', async (req, res, next) => {//TODO: This
     let page = req.query.page;
     let studentId = req.query.studentId;
     let id = req.params.id;
+    let submissions = [];
     if(id){
         try{
             //Admin or instructor of course of assignment with given id
@@ -66,26 +67,23 @@ router.get('/:id/submissions', async (req, res, next) => {//TODO: This
             if(assignment){
                 let course = await course_db.find_by_id(assignment.courseId);
                 if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+                    //Default page value is 1
+                    if(!page){
+                        page = 1;
+                    }
+
                     if(studentId){
-                        //Get submissions of assignment by studentId
-                        let submissions = assignment_db.submissions_by_studentId;
+                        //Get submissions of assignment by studentId if queried
+                        submissions = assignment_db.submissions_by_studentId(id, page);
                     }
                     else{
                         //Get submissions just by assignmentId
-                        let submissions = assignment_db.submissions_by_id
+                        submissions = assignment_db.submissions_by_id(id, page);
                     }
-                    //Default page value is 1
-                    if(!page){page = 1;}
 
-                    //paginate
-                    const pageSize = 10;
-                    let submissions = assignment_db.submissions_by_id(id);
-                    let count = submissions.length;
-
-                    
                     res.status(200).send({
                         "page": page,
-                        "submissions": assignmentPage
+                        "submissions": submissions
                     })
                 }
                 else{

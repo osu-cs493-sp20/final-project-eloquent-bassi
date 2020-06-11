@@ -16,11 +16,11 @@ exports.remove_by_id = async (id) => {//TODO: This
     return
 }
 
-exports.submissions_by_id = async (id) => {//TODO: This
+exports.submissions_by_id = async (id, page) => {//TODO: This
     return
 }
 
-exports.submissions_by_studentId = async (id) =>{//TODO: this
+exports.submissions_by_studentId = async (id, page) =>{//TODO: this
     return 
 }
 
