@@ -59,10 +59,12 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.get('/:id/students', checkJwt, async (req, res, next) => {
+  let id = req.params.id;
+  let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-      const students = await get_students_by_id(parseInt(req.params.id));
+      const students = await courses_db.students_by_id(parseInt(id));
       if (students) {
         res.status(200).send(students);
       } else {
@@ -133,20 +135,20 @@ router.post('/', checkJwt, async (req, res, next) => {
 });
 
 router.post('/:id/students', checkJwt, async (req, res, next) => {
-  let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
       if (req.body.add) {
         req.body.add.forEach(async(item, i) => {
-          const result = await courses_db.enroll_by_id(req.params.id, parseInt(i));
+          console.log("item: ", item, "i:", i);
+          const result = await courses_db.enroll_by_id(id, parseInt(item));
         });
       }
       if (req.body.remove) {
         req.body.remove.forEach( async(item, i) => {
-          const result = await courses_db.remove_by_id(req.params.id, parseInt(i));
+          const result = await courses_db.unenroll_by_id(id, parseInt(item));
         });
       }
       res.status(200).send("Success");
@@ -154,6 +156,7 @@ router.post('/:id/students', checkJwt, async (req, res, next) => {
         res.status(403).send({"Error": "Unauthorized request"})
     }
   } catch (err) {
+    console.log("==Error: ", err);
     res.status(400).send({
       error: "Request body contains at least one invalid user."
     });
