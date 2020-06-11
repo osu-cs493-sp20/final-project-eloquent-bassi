@@ -165,15 +165,14 @@ router.post('/:id/students', checkJwt, async (req, res, next) => {
 //==PATCH==
 router.patch('/:id', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
-  if(body && id && schemaValidate("createCourseBody", body)){
+  if(body && id && schemaValidate("courseSchema", body)){
     //admin or instructor of the course
         try{
-            let course = await courses_db.find_by_id(body.courseId);
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            if(jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === body.instructor_id)){
                 if(await courses_db.update_by_id(id, body)){
-                    res.status(200);
+                    res.status(200).send("Success");
                 }
                 else{
                     res.status(404).send({"Error": "Course with id " + id + " not found."});
@@ -184,6 +183,7 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
                 res.status(403).send({"Error": "Unauthorized request"})
             }
         } catch (err) {
+            console.log("error: ", err);
             res.status(500).send({"Error": err})
         }
     }
@@ -195,14 +195,14 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
 //==DELETE==
 router.delete('/:id', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try {
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin')){
-      const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
+      const deleteSuccessful = await courses_db.remove_by_id(parseInt(id));
       if (deleteSuccessful) {
-        res.status(204).end();
+        res.status(204).send();
       } else {
         next();
       }

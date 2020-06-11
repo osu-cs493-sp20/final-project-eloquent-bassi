@@ -34,19 +34,18 @@ exports.find_by_id = async (id) => {
 }
 
 exports.update_by_id = async (id, course) => {
-  const [ result ] = await mysqlPool.query('UPDATE SET ? WHERE course_id = ?', [course,id]);
+  const [ result ] = await mysqlPool.query('UPDATE Course SET ? WHERE course_id = ?', [course,id]);
   return result;
 }
 
 exports.remove_by_id = async (id) => {
-  const [ result ] = await mysqlPool.query('DELETE * FROM Course WHERE course_id = ?;',id);
+  const [ result ] = await mysqlPool.query('DELETE FROM Course WHERE course_id = ?;',id);
   return result;
 }
 
 exports.students_by_id = async (id) => {
   const [ result ] = await mysqlPool.query('SELECT user_id, name, email FROM Enrolled_in JOIN Users WHERE Enrolled_in.student_id = Users.user_id AND course_id = ?;',id);
   return result;
-  return
 }
 
 exports.enroll_by_id = async (course_id, student_id) => {
