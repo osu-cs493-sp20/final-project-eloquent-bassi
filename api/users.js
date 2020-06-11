@@ -45,8 +45,8 @@ router.get('/:id', checkJwt, async (req, res, next) => {//TODO: This
 
 router.post('/login', async (req, res, next) => {//TODO: This
     //FIXME: We might want to do some verification on the email before we query with it
-    let email = req.body.email.toString() || null
-    let password = req.body.password.toString() || null
+    let email = req.body.email || null
+    let password = req.body.password || null
     if(email && password){
         try {
             let hash = await find_hash_by_email(email)    
@@ -60,7 +60,7 @@ router.post('/login', async (req, res, next) => {//TODO: This
             }
         }
         catch (err){
-            res.status().send({"Error": err})
+            res.status(401).send({"Error": err})
         }
     }
     res.status(400).send({"Error": "Bad request"})
