@@ -1,8 +1,10 @@
 const router = require('express').Router();
+
 const { checkJwt }= require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
+const user_db = require('../storage/users_db');
 
 const assignmentSchema = {
     "$id": "createAssignmentBody",
@@ -16,10 +18,25 @@ const assignmentSchema = {
     }
 };
 
+const submissionSchema = {
+    "$id": "createSubmissionBody",
+    "type": "object",
+    "required": ["assignmentId", "studentId", "timestamp", "file"],
+    "properties": {
+        "assignmentId": { "type": "integer" },
+        "studentId": { "type": "integer" },
+        "timestamp": { "type": "string",
+                       "format": "date-time"                    
+        },
+        "file": { "type": "string" }
+    }    
+};
+
 schemaAdd(assignmentSchema);
+schemaAdd(submissionSchema);
 
 //==GET==
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', checkJwt, async (req, res, next) => {
     let id = req.body.id;
     if(id){
         try{
@@ -37,10 +54,51 @@ router.get('/:id', async (req, res, next) => {
     else{
         res.status(400).send({"Error": "Bad request"})
     }
-})
+});
 
 router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+    //Requires page (query), studentid(query), id (path)
+    let page = req.query.page;
+    let studentId = req.query.studentId;
+    let id = req.params.id;
+    let submissions = [];
+    try{
+         //Admin or instructor of course of assignment with given id
+        let assignment = await assignment_db.find_by_id(id);
+        if(assignment){
+            let course = await course_db.find_by_id(assignment.courseId);
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+                //Default page value is 1
+                if(!page){
+                    page = 1;
+                }
+
+                //If studentId was queried and does exist
+                if(studentId && user_db.find_by_id(studentId)){
+                    submissions = assignment_db.submissions_by_studentId(id, studentId, page);
+                }
+                //Get submissions just by assignmentId
+                else{
+                    submissions = assignment_db.submissions_by_id(id, page);
+                }
+
+                res.status(200).send({
+                    "page": page,
+                    "submissions": submissions
+                })
+            }
+            else{
+                res.status(403).send({"Error": "Unauthorized request"});
+            }
+        }
+        else{
+            res.status(404).send({"Error": "Assignment with id " + id + " not found."});
+        }
+    }
+    catch(err){
+        res.status(500).send({"Error": err})
+    }
+
 })
 
 //==POST==
@@ -71,8 +129,34 @@ router.post('/', checkJwt, async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
-    res.status(200).send("TBD")
+router.post('/:id/submissions', checkJwt, async (req, res, next) => {
+    let body = req.body;
+    let assignmentId = req.params.id;
+    let jwt = req.jwt;
+    if(body && schemaValidate("createSubmissionBody", body)){
+        try{
+            let assignment = assignment_db.find_by_id(assignmentId);
+
+            //Check if they're a student and enrolled in the course
+            //TODO: Update or find actual method to find out if a student is enrolled in a class
+            if(jwt.role === "student" && course_db.is_enrolled(assignment.courseId, jwt.sub)){
+                let submissionId = assignment_db.submit(body, assignmentId);
+                res.status(200).send({
+                    "id": submissionId
+                })
+            }
+            else{
+                res.status(403).send({"Error": "Unauthorized request"})
+            }
+        }
+        catch(err){
+            res.status(500).send({"Error": err})
+        }
+    }
+    else{
+        res.status(400).send({"Error": "Invalid body"}) 
+    }
+
 })
 
 //==PATCH==
