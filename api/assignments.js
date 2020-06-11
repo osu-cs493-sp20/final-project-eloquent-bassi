@@ -45,8 +45,10 @@ const upload = multer({
     storage: multer.diskStorage({
       dest: `/uploads`,
       filename: (req, file, callback) => {
-        const filename = crypto.pseudoRandomBytes(16).toString("hex");
-        callback(null, `${filename}` + path.extname(file.originalname));
+          console.log("OG name: ", file.originalname);
+        let filename = crypto.pseudoRandomBytes(16).toString("hex");
+        filename = filename + path.extname(file.originalname);
+        callback(null, filename);
       }
     })
   });
@@ -154,27 +156,28 @@ router.post('/', checkJwt, async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) => {
-    console.log("Top of submission post");
+router.post('/:id/submissions', checkJwt, upload.any("file"), async (req, res, next) => {
     let body = req.body;
     let assignment_id = req.params.id;
     let jwt = req.jwt;
     let submission = {
-        "assignmentId": body.assignment_id,
-        "studentId": body.student_id,
+        "assignment_id": parseInt(body.assignment_id),
+        "student_id": parseInt(body.student_id),
         "timestamp": body.timestamp,
-        "file": req.file.filename
+        "file": req.files[0].filename
     };
-    if(body && schemaValidate("createSubmissionBody", sub)){
+    if(body && schemaValidate("createSubmissionBody", submission)){
         try{
-            let assignment = assignment_db.find_by_id(assignment_id);
+            let assignment = await assignment_db.find_by_id(assignment_id);
 
             //Check if they're a student and match the assignment being submitted
-            if(jwt.role === "student" && jwt.sub === body.student_id){
+            if(jwt.role === "student" && jwt.sub == body.student_id){
 
                 //Upload file then submit submission
-                uploadFile(req.file.path, req.file.filename, file.mimetype);
-                let submission_id = assignment_db.submit(submission, assignment.course_id);
+                uploadFile(req.files[0].path, req.files[0].filename, req.files[0].mimetype);
+                console.log("file uploaded");
+                console.log(assignment);
+                let submission_id = await assignment_db.submit(submission, assignment.course_id);
                 res.status(200).send({
                     "id": submission_id
                 })
@@ -184,6 +187,7 @@ router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) =
             }
         }
         catch(err){
+            console.log("error:", err);
             res.status(500).send({"Error": err})
         }
     }

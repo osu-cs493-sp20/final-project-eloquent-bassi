@@ -13,11 +13,10 @@ exports.create = async (assignment) => {
     return result.insertId;
 }
 
-exports.submit = async (submission, courseId) => {
+exports.submit = async (submission, course_id) => {
+    console.log("submission:", submission,"coursid:", course_id);
     //Check if student is enrolled in the class
-    const enrolled = await mysqlPool.query(`SELECT * FROM Enrolled WHERE 
-                                            student_id=${submission.studentId} AND 
-                                            course_id=${courseId}`);
+    const enrolled = await mysqlPool.query(`SELECT * FROM Enrolled_in WHERE student_id=${submission.student_id} AND course_id=${course_id}`);
     if(enrolled){
         let params = [
             submission.assignment_id,
