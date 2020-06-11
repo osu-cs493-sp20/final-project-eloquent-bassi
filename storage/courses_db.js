@@ -48,8 +48,14 @@ exports.students_by_id = async (id) => {
   return
 }
 
-exports.enroll_by_id = async (id) => {
-    return
+exports.enroll_by_id = async (course_id, student_id) => {
+    const [ result ] = await mysqlPool.query('INSERT INTO Enrolled_in (course_id,student_id) VALUES (?, ?);',[course_id,student_id]);
+    return result;
+}
+
+exports.unenroll_by_id = async (course_id, student_id) => {
+    const [ result ] = await mysqlPool.query('DELETE FROM Enrolled_in WHERE course_id = ? AND student_id = ?;',[course_id,student_id]);
+    return result;
 }
 
 exports.assignments_by_id = async (id) => {
