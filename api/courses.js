@@ -4,7 +4,17 @@ const { schemaAdd, schemaValidate } = require("../lib/validate");
 const courses_db = require('../storage/courses_db');
 
 const courseSchema = {
-  //TODO: Fill this in
+  "$id": "createCourseBody",
+  "type": "object",
+  "required": ["subject","number","title","term","instructor_id"],
+  "properties": {
+    "subject":{"type": "string"},
+    "number":{"type": "integer"},
+    "title":{"type": "string"},
+    "term":{"type": "string"},
+    "instructor_id": {"type": "integer"},
+    "description": {"type": "string"}
+  }
 }
 
 schemaAdd(courseSchema);
@@ -95,7 +105,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/:id/students', async (req, res, next) => {//TODO: This
+router.post('/:id/students', async (req, res, next) => {
   try {
     if (req.body.add) {
       req.body.add.forEach((item, i) => {
@@ -107,7 +117,7 @@ router.post('/:id/students', async (req, res, next) => {//TODO: This
         const result = await courses_db.remove_by_id(req.params.id, parseInt(i));
       });
     }
-    res.status(200);
+    res.status(200).send("Success");
   } catch (err) {
     res.status(400).send({
       error: "Request body contains at least one invalid user."
