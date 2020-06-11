@@ -46,7 +46,7 @@ router.get('/:id', async (req, res, next) => {
             }
         }
         catch(err){
-            res.status().send({"Error": err})
+            res.status(500).send({"Error": err})
         }
     }
     else{
@@ -120,7 +120,7 @@ router.post('/', async (req, res, next) => {
             }
         }
         catch(err){
-            res.status().send({"Error": err})
+            res.status(500).send({"Error": err})
         }
     }
     else{
@@ -157,7 +157,7 @@ router.patch('/:id', async (req, res, next) => {
             }
         }
         catch{
-            res.status().send({"Error": err})
+            res.status(500).send({"Error": err})
         }
     }
     else{
@@ -188,7 +188,7 @@ router.delete('/:id', async (req, res, next) => {
         }
     }
     catch{
-        res.status().send({"Error": err})
+        res.status(500).send({"Error": err})
     }
 })
 
