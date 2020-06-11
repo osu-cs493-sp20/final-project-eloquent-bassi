@@ -1,10 +1,13 @@
 const router = require('express').Router();
+const multer = require('multer');
+const crypto = require('crypto');
 
 const { checkJwt }= require('../lib/auth');
 const assignment_db = require('../storage/assignments_db');
 const { schemaAdd, schemaValidate } = require('../lib/validate');
 const course_db = require('../storage/courses_db');
 const user_db = require('../storage/users_db');
+const { uploadFile, getFile } = require('../lib/files');
 
 const assignmentSchema = {
     "$id": "createAssignmentBody",
@@ -21,7 +24,7 @@ const assignmentSchema = {
 const submissionSchema = {
     "$id": "createSubmissionBody",
     "type": "object",
-    "required": ["assignmentId", "studentId", "timestamp", "file"],
+    "required": ["studentId", "timestamp", "file"],
     "properties": {
         "assignmentId": { "type": "integer" },
         "studentId": { "type": "integer" },
@@ -35,9 +38,23 @@ const submissionSchema = {
 schemaAdd(assignmentSchema);
 schemaAdd(submissionSchema);
 
+//Multer stuff to get a file
+const upload = multer({
+    storage: multer.diskStorage({
+      dest: `${__dirname}/uploads`,
+      filename: (req, file, callback) => {
+        const filename = crypto.pseudoRandomBytes(16).toString("hex");
+        const extension = file.mimetype;
+        callback(null, `${filename}.${extension}`);
+      }
+    })
+  });
+
+
+
 //==GET==
 router.get('/:id', checkJwt, async (req, res, next) => {
-    let id = req.body.id;
+    let id = req.params.id;
     if(id){
         try{
             let assignment = await assigment_db.find_by_id(id);
@@ -82,6 +99,10 @@ router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
                     submissions = assignment_db.submissions_by_id(id, page);
                 }
 
+                for(x in submissions){
+                    let url = getFile(x.file);
+                    x.url = url;
+                }
                 res.status(200).send({
                     "page": page,
                     "submissions": submissions
@@ -129,18 +150,26 @@ router.post('/', checkJwt, async (req, res, next) => {
     }
 })
 
-router.post('/:id/submissions', checkJwt, async (req, res, next) => {
+router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) => {
     let body = req.body;
     let assignmentId = req.params.id;
     let jwt = req.jwt;
-    if(body && schemaValidate("createSubmissionBody", body)){
+    let submission = {
+        "assignmentId": body.assignmentId,
+        "studentId": body.studentId,
+        "timestamp": body.timestamp,
+        "file": req.file.filename
+    };
+    if(body && schemaValidate("createSubmissionBody", sub)){
         try{
             let assignment = assignment_db.find_by_id(assignmentId);
 
-            //Check if they're a student and enrolled in the course
-            //TODO: Update or find actual method to find out if a student is enrolled in a class
-            if(jwt.role === "student" && course_db.is_enrolled(assignment.courseId, jwt.sub)){
-                let submissionId = assignment_db.submit(body, assignmentId);
+            //Check if they're a student and match the assignment being submitted
+            if(jwt.role === "student" && jwt.sub === body.studentId){
+
+                //Upload file then submit submission
+                uploadFile(req.file.path, req.file.filename, file.mimetype);
+                let submissionId = assignment_db.submit(submission, assignment.courseId);
                 res.status(200).send({
                     "id": submissionId
                 })
@@ -162,7 +191,7 @@ router.post('/:id/submissions', checkJwt, async (req, res, next) => {
 //==PATCH==
 router.patch('/:id', checkJwt, async (req, res, next) => {
     let body = req.body
-    let id = body.id;
+    let id = req.params.id;
     let jwt = req.jwt;
     if(body && id && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course

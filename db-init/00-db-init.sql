@@ -71,7 +71,6 @@ CREATE TABLE `Enrolled_in` (
 
 CREATE TABLE `Submission` (
   `submission_id` int(6) NOT NULL,
-  `description` varchar(500) NOT NULL,
   `timestamp` date NOT NULL,
   `file` varchar(256) NOT NULL,
   `assignment_id` int(6) NOT NULL,
