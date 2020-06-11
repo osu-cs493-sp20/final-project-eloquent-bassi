@@ -20,6 +20,10 @@ exports.submissions_by_id = async (id) => {//TODO: This
     return
 }
 
+exports.submissions_by_studentId = async (id) =>{//TODO: this
+    return 
+}
+
 exports.update_submission_by_id = async (id) => {//TODO: This
     return
 }
