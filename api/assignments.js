@@ -14,7 +14,7 @@ const assignmentSchema = {
     "type": "object",
     "required": ["courseId", "title", "points", "due"],
     "properties": {
-        "courseId": { "type": "integer" },
+        "course_id": { "type": "integer" },
         "title": { "type": "string" },
         "points": { "type": "integer" },
         "due": { "type": "string" ,
@@ -27,8 +27,8 @@ const submissionSchema = {
     "type": "object",
     "required": ["studentId", "timestamp", "file"],
     "properties": {
-        "assignmentId": { "type": "integer" },
-        "studentId": { "type": "integer" },
+        "assignment_id": { "type": "integer" },
+        "student_id": { "type": "integer" },
         "timestamp": { "type": "string",
                        "format": "date-time"
         },
@@ -85,16 +85,16 @@ router.get('/:id/submissions', checkJwt, async (req, res, next) => {//TODO: This
          //Admin or instructor of course of assignment with given id
         let assignment = await assignment_db.find_by_id(id);
         if(assignment){
-            let course = await course_db.find_by_id(assignment.courseId);
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            let course = await course_db.find_by_id(assignment.course_id);
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructor_id))){
                 //Default page value is 1
                 if(!page){
                     page = 1;
                 }
 
                 //If studentId was queried and does exist
-                if(studentId && user_db.find_by_id(studentId)){
-                    submissions = assignment_db.submissions_by_studentId(id, studentId, page);
+                if(student_id && user_db.find_by_id(student_id)){
+                    submissions = assignment_db.submissions_by_studentId(id, student_id, page);
                 }
                 //Get submissions just by assignmentId
                 else{
@@ -131,8 +131,8 @@ router.post('/', checkJwt, async (req, res, next) => {
     if(body && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
         try{
-            let course = await course_db.find_by_id(body.courseId);
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            let course = await course_db.find_by_id(body.course_id);
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructor_id))){
                 let id = await assignment_db.create(body);
                 console.log("id value:",id);
                 res.status(201).send({
@@ -155,26 +155,26 @@ router.post('/', checkJwt, async (req, res, next) => {
 
 router.post('/:id/submissions', checkJwt, upload.any(), async (req, res, next) => {
     let body = req.body;
-    let assignmentId = req.params.id;
+    let assignment_id = req.params.id;
     let jwt = req.jwt;
     let submission = {
-        "assignmentId": body.assignmentId,
-        "studentId": body.studentId,
+        "assignmentId": body.assignment_id,
+        "studentId": body.student_id,
         "timestamp": body.timestamp,
         "file": req.file.filename
     };
     if(body && schemaValidate("createSubmissionBody", sub)){
         try{
-            let assignment = assignment_db.find_by_id(assignmentId);
+            let assignment = assignment_db.find_by_id(assignment_id);
 
             //Check if they're a student and match the assignment being submitted
-            if(jwt.role === "student" && jwt.sub === body.studentId){
+            if(jwt.role === "student" && jwt.sub === body.student_id){
 
                 //Upload file then submit submission
                 uploadFile(req.file.path, req.file.filename, file.mimetype);
-                let submissionId = assignment_db.submit(submission, assignment.courseId);
+                let submission_id = assignment_db.submit(submission, assignment.course_id);
                 res.status(200).send({
-                    "id": submissionId
+                    "id": submission_id
                 })
             }
             else{
@@ -199,8 +199,8 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
     if(body && id && schemaValidate("createAssignmentBody", body)){
         //admin or instructor of the course
         try{
-            let course = await course_db.find_by_id(body.courseId);
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            let course = await course_db.find_by_id(body.course_id);
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructor_id))){
                 //TODO: change assignemnt_db.update_by_id parameters to take a body
                 if(await assignment_db.update_by_id(id, body)){
                     res.status(200);
@@ -228,12 +228,12 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
 router.delete('/:id', checkJwt, async (req, res, next) => {
     let id = req.params.id;
     try{
-        //Get instructorId of course of the assignment
+        //Get instructor_d of course of the assignment
         let assignment = await assignment_db.find_by_id(id);
         if(assignment){
-            let course = await course_db.find_by_id(assignment.courseId);
+            let course = await course_db.find_by_id(assignment.course_id);
             //Is admin or instructor of course
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructor_id))){
                 await assignment_db.remove_by_id(id);   //Already checked if assignment exists, so just delete it
                 res.status(204);
             }
