@@ -16,7 +16,7 @@ const userSchema = {
 };
 schemaAdd(userSchema);
 
-router.get('/:id', checkJwt, async (req, res, next) => {//TODO: This
+router.get('/:id', checkJwt, async (req, res, next) => {
     let jwt = req.jwt
     if(jwt && jwt.role === "instructor"){
         let id = req.params.id
@@ -43,7 +43,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {//TODO: This
     }
 })
 
-router.post('/login', async (req, res, next) => {//TODO: This
+router.post('/login', async (req, res, next) => {
     //FIXME: We might want to do some verification on the email before we query with it
     let email = req.body.email || null
     let password = req.body.password || null
@@ -66,7 +66,7 @@ router.post('/login', async (req, res, next) => {//TODO: This
     res.status(400).send({"Error": "Bad request"})
 })
 
-router.post('/', checkJwt, async (req, res, next) => {//TODO: This
+router.post('/', checkJwt, async (req, res, next) => {
     // Extract the body
     let body = body
     // If we have a body and it's valid

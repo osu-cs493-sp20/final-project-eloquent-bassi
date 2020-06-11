@@ -88,7 +88,7 @@ exports.get_corses_by_instructor_id = async (id) => {
  * @param {number} id
  * @returns {array[json]} All of the corses the student is in. Can be empty
  */
-exports.get_corses_by_student_id = async (id) => {//TODO: This
+exports.get_corses_by_student_id = async (id) => {
     return await mysqlpool.query(`SELECT * FROM Corse INNER JOIN Enrolled_in ON 
     Enrolled_in.student_id = ${id} AND Enrolled_in.corse_id = Corse.corse_id`)
 }
