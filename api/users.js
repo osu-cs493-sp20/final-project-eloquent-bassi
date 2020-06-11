@@ -21,9 +21,10 @@ schemaAdd(userSchema);
 
 router.get('/:id', checkJwt, async (req, res, next) => {
     let jwt = req.jwt
+    let userid = await find_id_by_email(jwt.email)
     if(jwt && jwt.role === "instructor"){
         let id = req.params.id
-        if(exists(id)){
+        if(await exists(id) && userid == id){
             let data = await get_courses_by_instructor_id(id)
             res.status(200).send(data)
         }
@@ -33,7 +34,7 @@ router.get('/:id', checkJwt, async (req, res, next) => {
     }
     else if (jwt && jwt.role === "student"){
         let id = req.params.id
-        if(exists(id)){
+        if(await exists(id) && userid == id){
             let data = await students_by_id(id)
             res.status(200).send(data)
         }
