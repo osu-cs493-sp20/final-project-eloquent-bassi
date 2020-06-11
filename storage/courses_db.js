@@ -38,18 +38,17 @@ exports.update_by_id = async (id) => {
 }
 
 exports.remove_by_id = async (id) => {
-    return
+  const [ result ] = await mysqlPool.query('DELETE * FROM Course WHERE course_id = ?;',id);
+  return result;
 }
 
 exports.students_by_id = async (id) => {
-    return
+  const [ result ] = await mysqlPool.query('SELECT * FROM Enrolled_in JOIN Users WHERE Enrolled_in.student_id = Users.user_id AND course_id = ?;',id);
+  return result;
+  return
 }
 
 exports.enroll_by_id = async (id) => {
-    return
-}
-
-exports.roster_by_id = async (id) => {
     return
 }
 
