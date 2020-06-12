@@ -1,0 +1,330 @@
+{
+	"info": {
+		"_postman_id": "5ef7047c-9187-457c-b3eb-8902b508685c",
+		"name": "courses",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{base_url}}/courses/",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"subject\": \"Computer Science\",\n\t\"number\": 493,\n\t\"title\": \"Cloud App Development\",\n\t\"term\": \"spring\",\n\t\"instructor_id\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/courses/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1 Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1/students",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"add\": [\n\t\t3,\n\t\t4\n\t\t],\n\t\"remove\":[\n\t\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/courses/1/students",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1",
+						"students"
+					]
+				},
+				"description": "Adds 2 students"
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1/students",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"add\": [\n\t\t],\n\t\"remove\":[\n\t\t4\n\t\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/courses/1/students",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1",
+						"students"
+					]
+				},
+				"description": "Removes one student\n"
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1/students",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1/students",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1",
+						"students"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1/roster",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1/roster",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1",
+						"roster"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"subject\": \"CS\",\n\t\"number\": 492,\n\t\"title\": \"Mobile App Development\",\n\t\"term\": \"spring\",\n\t\"instructor_id\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/courses/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{base_url}}/courses/1 Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/courses/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"courses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTU5MTg5NTYzOCwiZXhwIjoxNTkxOTgyMDM4fQ.QqKA6z7ct13hhk_mJq3VGRdq6VQp4GqG6cd2DWWy15c",
+				"type": "string"
+			}
+		]
+	},
+	"protocolProfileBehavior": {}
+}

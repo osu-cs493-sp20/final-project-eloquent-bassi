@@ -59,10 +59,12 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.get('/:id/students', checkJwt, async (req, res, next) => {
+  let id = req.params.id;
+  let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-      const students = await get_students_by_id(parseInt(req.params.id));
+      const students = await courses_db.students_by_id(parseInt(id));
       if (students) {
         res.status(200).send(students);
       } else {
@@ -81,15 +83,14 @@ router.get('/:id/students', checkJwt, async (req, res, next) => {
 
 //WARNING: I think this works, but it hasn't been tested, and if you have a better solution, go for it
 router.get('/:id/roster', checkJwt, async (req, res, next) => {
-  let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
-      const roster = await courses_db.get_students_by_id(req.params.id);
+      const roster = await courses_db.students_by_id(id);
       var rosterCSV = convertToCSV(roster);
-      res.attachment(`roster_course_${res.params.id}.csv`);
+      res.attachment(`roster_course_${id}.csv`);
       res.status(200).send(rosterCSV);
     } else {
         res.status(403).send({"Error": "Unauthorized request"})
@@ -105,12 +106,10 @@ router.get('/:id/roster', checkJwt, async (req, res, next) => {
 //==POST==
 router.post('/', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
   let jwt = req.jwt;
   if (schemaValidate("courseSchema", req.body)) {
     try{
-      let course = await courses_db.find_by_id(body.courseId);
-      if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+      if(jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === body.instructorId)){
         const id = await courses_db.create(req.body);
         res.status(201).send({
           id: id,
@@ -135,20 +134,20 @@ router.post('/', checkJwt, async (req, res, next) => {
 });
 
 router.post('/:id/students', checkJwt, async (req, res, next) => {
-  let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try{
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
       if (req.body.add) {
         req.body.add.forEach(async(item, i) => {
-          const result = await courses_db.enroll_by_id(req.params.id, parseInt(i));
+          console.log("item: ", item, "i:", i);
+          const result = await courses_db.enroll_by_id(id, parseInt(item));
         });
       }
       if (req.body.remove) {
         req.body.remove.forEach( async(item, i) => {
-          const result = await courses_db.remove_by_id(req.params.id, parseInt(i));
+          const result = await courses_db.unenroll_by_id(id, parseInt(item));
         });
       }
       res.status(200).send("Success");
@@ -156,6 +155,7 @@ router.post('/:id/students', checkJwt, async (req, res, next) => {
         res.status(403).send({"Error": "Unauthorized request"})
     }
   } catch (err) {
+    console.log("==Error: ", err);
     res.status(400).send({
       error: "Request body contains at least one invalid user."
     });
@@ -165,15 +165,14 @@ router.post('/:id/students', checkJwt, async (req, res, next) => {
 //==PATCH==
 router.patch('/:id', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
-  if(body && id && schemaValidate("createCourseBody", body)){
+  if(body && id && schemaValidate("courseSchema", body)){
     //admin or instructor of the course
         try{
-            let course = await courses_db.find_by_id(body.courseId);
-            if(course && (jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === course.instructorId))){
+            if(jwt.role === 'admin' || (jwt.role === 'instructor' && jwt.sub === body.instructor_id)){
                 if(await courses_db.update_by_id(id, body)){
-                    res.status(200);
+                    res.status(200).send("Success");
                 }
                 else{
                     res.status(404).send({"Error": "Course with id " + id + " not found."});
@@ -184,6 +183,7 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
                 res.status(403).send({"Error": "Unauthorized request"})
             }
         } catch (err) {
+            console.log("error: ", err);
             res.status(500).send({"Error": err})
         }
     }
@@ -195,14 +195,14 @@ router.patch('/:id', checkJwt, async (req, res, next) => {
 //==DELETE==
 router.delete('/:id', checkJwt, async (req, res, next) => {
   let body = req.body
-  let id = body.id;
+  let id = req.params.id;
   let jwt = req.jwt;
   try {
-    let course = await courses_db.find_by_id(body.courseId);
+    let course = await courses_db.find_by_id(id);
     if(course && (jwt.role === 'admin')){
-      const deleteSuccessful = await courses_db.remove_by_id(parseInt(req.params.id));
+      const deleteSuccessful = await courses_db.remove_by_id(parseInt(id));
       if (deleteSuccessful) {
-        res.status(204).end();
+        res.status(204).send();
       } else {
         next();
       }

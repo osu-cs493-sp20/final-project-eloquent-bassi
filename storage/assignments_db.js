@@ -4,7 +4,7 @@ const mysqlPool = require('../lib/mysqlPool');
 
 exports.create = async (assignment) => {
     let params = [
-        assignment.courseId,
+        assignment.course_id,
         assignment.title,
         assignment.points,
         assignment.due
@@ -13,15 +13,14 @@ exports.create = async (assignment) => {
     return result.insertId;
 }
 
-exports.submit = async (submission, courseId) => {
+exports.submit = async (submission, course_id) => {
+    console.log("submission:", submission,"coursid:", course_id);
     //Check if student is enrolled in the class
-    const enrolled = await mysqlPool.query(`SELECT * FROM Enrolled WHERE 
-                                            student_id=${submission.studentId} AND 
-                                            course_id=${courseId}`);
+    const enrolled = await mysqlPool.query(`SELECT * FROM Enrolled_in WHERE student_id=${submission.student_id} AND course_id=${course_id}`);
     if(enrolled){
         let params = [
-            submission.assignmentId,
-            submission.studentId,
+            submission.assignment_id,
+            submission.student_id,
             submission.timestamp,
             submission.file
         ];
@@ -34,12 +33,13 @@ exports.submit = async (submission, courseId) => {
 }
 
 exports.find_by_id = async (id) => {
-    const [result] = await mysqlPool.query('SELECT * FROM Assignment WHERE id= ?', id);
+    const [result] = await mysqlPool.query('SELECT * FROM Assignment WHERE assignment_id= ?', id);
     return result[0];
 }
 
 exports.update_by_id = async (id, assignment) => {
-    const [result] = await mysqlPool.query('UPDATE SET ? WHERE assignment_id = ?', [assignment, id]);
+    const [result] = await mysqlPool.query('UPDATE Assignment SET ? WHERE assignment_id = ?', [assignment, id]);
+
     return result;
 }
 
